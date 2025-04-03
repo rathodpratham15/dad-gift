@@ -1,132 +1,115 @@
-/* Container */
 .enhanced-login-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #f9fafb; /* Light gray background */
-    padding: 1.5rem;
+    background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+    padding: 1rem;
     font-family: "Poppins", sans-serif;
 }
 
-/* Card */
 .enhanced-login-card {
     background: white;
     padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     width: 100%;
-}
-
-/* Title */
-.enhanced-login-title {
-    font-size: 1.875rem; /* Tailwind's text-3xl */
-    font-weight: bold;
-    color: #1f2937; /* Dark gray */
-    margin-bottom: 1.5rem;
+    max-width: 400px;
     text-align: center;
 }
 
-/* Form */
+.enhanced-login-title {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+}
+
 .enhanced-login-form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-/* Input Group */
-.enhanced-login-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.enhanced-login-label {
-    font-size: 0.875rem; /* Tailwind's text-sm */
-    font-weight: 500;
-    color: #374151; /* Softer gray */
-}
-
 .enhanced-login-input {
-    border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
     border-radius: 8px;
-    padding: 0.75rem;
     font-size: 1rem;
-    transition: border-color 0.3s, transform 0.3s;
+    color: #374151;
+    transition: all 0.2s ease;
 }
 
 .enhanced-login-input:focus {
-    border-color: #3b82f6; /* Tailwind's blue-500 */
     outline: none;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); /* Tailwind's ring */
-    transform: translateY(-2px); /* Slight lift effect */
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-/* Error Message */
 .enhanced-login-error {
-    color: #ef4444; /* Tailwind's red-500 */
-    font-size: 0.875rem;
-    text-align: center;
+    color: #dc2626;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
 }
 
-/* Button */
 .enhanced-login-button {
-    background-color: #3b82f6; /* Tailwind's blue-500 */
+    background-color: #3b82f6;
     color: white;
+    padding: 0.75rem;
     border: none;
     border-radius: 8px;
-    padding: 0.75rem;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.enhanced-login-button:disabled {
-    background-color: #93c5fd; /* Tailwind's blue-300 */
-    cursor: not-allowed;
+    transition: all 0.2s ease;
+    min-height: 48px;
 }
 
 .enhanced-login-button:hover:not(:disabled) {
-    background-color: #2563eb; /* Tailwind's blue-700 */
-    transform: translateY(-2px); /* Hover lift effect */
+    background-color: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
-/* Footer */
+.enhanced-login-button:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+}
+
 .enhanced-login-footer {
-    text-align: center;
     margin-top: 1.5rem;
-    font-size: 0.875rem; /* Tailwind's text-sm */
-    color: #6b7280; /* Softer gray */
+    font-size: 0.9rem;
+    color: #6b7280;
 }
 
-.enhanced-signup-link {
-    background: none;
-    border: none;
-    color: #3b82f6; /* Tailwind's blue-500 */
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: underline;
-    padding: 0;
-}
-
-.enhanced-signup-link:hover {
-    color: #2563eb; /* Tailwind's blue-700 */
+.enhanced-login-signup-link {
+    color: #3b82f6;
     text-decoration: none;
+    font-weight: 500;
+}
+
+.enhanced-login-signup-link:hover {
+    text-decoration: underline;
+    color: #2563eb;
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-    .enhanced-login-container {
-        padding: 1rem;
-    }
-
+@media (max-width: 480px) {
     .enhanced-login-card {
-        padding: 1.5rem;
+        padding: 1rem;
+        margin: 0 0.5rem;
     }
-
     .enhanced-login-title {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
+    }
+    .enhanced-login-input {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .enhanced-login-button {
+        font-size: 0.9rem;
+    }
+    .enhanced-login-footer {
+        font-size: 0.85rem;
     }
 }

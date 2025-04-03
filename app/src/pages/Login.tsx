@@ -1,43 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css";
 import axios from "axios";
+import "../styles/Login.css";
 
 interface LoginProps {
     onLogin: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [formData, setFormData] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         setError("");
+        setLoading(true);
 
         try {
-            // Debugging: Log credentials being sent
-            console.log("Submitting Login Data:", { email, password });
-
-            const response = await axios.post("http://localhost:3002/api/auth/login", {
-                email,
-                password,
-            });
-
-            console.log("Login Response:", response.data);
-
+            const response = await axios.post("http://localhost:3002/api/auth/login", formData);
             localStorage.setItem("token", response.data.token);
-            localStorage.setItem("role", response.data.role);
+            localStorage.setItem("role", response.data.role || "user");
             onLogin();
-            navigate(response.data.role === "admin" ? "/admin" : "/home");
+            navigate(response.data.role === "admin" ? "/admin" : "/user-dashboard");
         } catch (err: any) {
-            console.error("Login Error:", err.response?.data || err.message);
-            setError("Invalid email or password!");
+            console.error("Login error:", err);
+            setError(err.response?.data?.message || "Login failed. Please check your credentials.");
         } finally {
             setLoading(false);
         }
@@ -47,35 +42,25 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <div className="enhanced-login-container">
             <div className="enhanced-login-card">
                 <h1 className="enhanced-login-title">Login</h1>
-                <form className="enhanced-login-form" onSubmit={handleSubmit}>
-                    <div className="enhanced-login-input-group">
-                        <label htmlFor="email" className="enhanced-login-label">
-                            Email
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="Enter your email"
-                            className="enhanced-login-input"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="enhanced-login-input-group">
-                        <label htmlFor="password" className="enhanced-login-label">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            placeholder="Enter your password"
-                            className="enhanced-login-input"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
+                <form onSubmit={handleSubmit} className="enhanced-login-form">
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="enhanced-login-input"
+                        required
+                    />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="enhanced-login-input"
+                        required
+                    />
                     {error && <p className="enhanced-login-error">{error}</p>}
                     <button
                         type="submit"
@@ -85,17 +70,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         {loading ? "Logging in..." : "Login"}
                     </button>
                 </form>
-                <div className="enhanced-login-footer">
-                    <p>
-                        Don’t have an account?{" "}
-                        <button
-                            className="enhanced-signup-link"
-                            onClick={() => navigate("/signup")}
-                        >
-                            Sign-up
-                        </button>
-                    </p>
-                </div>
+                <p className="enhanced-login-footer">
+                    Don’t have an account?{" "}
+                    <a href="/signup" className="enhanced-login-signup-link">
+                        Sign up here
+                    </a>
+                </p>
             </div>
         </div>
     );

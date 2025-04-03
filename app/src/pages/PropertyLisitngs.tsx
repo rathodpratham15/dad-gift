@@ -1,4 +1,3 @@
-// src/pages/PropertyListings.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -128,6 +127,7 @@ const PropertyListings: React.FC = () => {
                                                 src={`http://localhost:3002${property.images[0]}`}
                                                 alt={property.title}
                                                 className="unique-property-card-img"
+                                                loading="lazy"
                                             />
                                         ) : (
                                             <div className="unique-placeholder-img">No Image Available</div>
@@ -164,17 +164,9 @@ const PropertyListings: React.FC = () => {
                             disabled={page === 1}
                             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
                         >
-                            Previous
+                            Prev
                         </button>
-                        {[...Array(totalPages)].map((_, index) => (
-                            <button
-                                key={`page-${index}`}
-                                onClick={() => setPage(index + 1)}
-                                className={page === index + 1 ? "active" : ""}
-                            >
-                                {index + 1}
-                            </button>
-                        ))}
+                        <span>Page {page} of {totalPages}</span>
                         <button
                             disabled={page === totalPages}
                             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
@@ -185,9 +177,8 @@ const PropertyListings: React.FC = () => {
                 )}
             </div>
 
-            {/* Floating Buttons */}
             <AddToHomeScreenButton />
-            <WhatsAppButton message="Hi! I'm interested in a property"/>
+            <WhatsAppButton message="Hi! I'm interested in a property" />
         </div>
     );
 };

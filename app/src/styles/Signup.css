@@ -21,54 +21,59 @@
 }
 
 .signup-title {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
     font-weight: bold;
     color: #1f2937;
     margin-bottom: 1rem;
 }
 
-.signup-input,
-.signup-select {
-    width: 90%;
-    padding: 0.75rem;
+.signup-input {
+    padding: 0.75rem 1rem;
     border: 1px solid #d1d5db;
     border-radius: 8px;
     font-size: 1rem;
-    color: #1f2937;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    color: #374151;
+    transition: all 0.3s ease;
 }
 
-.signup-input:focus,
-.signup-select:focus {
-    border-color: #3b82f6;
+.signup-input:focus {
     outline: none;
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .signup-error {
     color: #ef4444;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
 }
 
 .signup-button {
-    padding: 0.75rem;
     background-color: #3b82f6;
     color: white;
+    padding: 0.75rem 1rem;
     border: none;
     border-radius: 8px;
-    font-weight: bold;
     font-size: 1rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
+    min-height: 48px;
 }
 
-.signup-button:hover {
+.signup-button:hover:not(:disabled) {
     background-color: #2563eb;
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.signup-button:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
 }
 
 .signup-footer {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     color: #6b7280;
     margin-top: 1rem;
 }
@@ -76,9 +81,33 @@
 .signup-link {
     color: #3b82f6;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 .signup-link:hover {
     text-decoration: underline;
+    color: #2563eb;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .signup-form {
+        padding: 1.5rem;
+        max-width: 100%;
+        margin: 0 1rem;
+    }
+    .signup-title {
+        font-size: 1.5rem;
+    }
+    .signup-input {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .signup-button {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    .signup-footer {
+        font-size: 0.85rem;
+    }
 }

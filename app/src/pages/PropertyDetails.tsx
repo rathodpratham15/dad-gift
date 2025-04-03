@@ -65,9 +65,7 @@ const PropertyDetails: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                console.log("Fetching property with ID:", id);
                 const propertyResponse = await axios.get(`http://localhost:3002/api/properties/${id}`);
-                console.log("Property response:", propertyResponse.data);
                 const propertyData = propertyResponse.data;
                 if (!propertyData.coordinates?.coordinates) {
                     if (propertyData.coordinatesWarning) {
@@ -81,7 +79,6 @@ const PropertyDetails: React.FC = () => {
                 const similarResponse = await axios.get(
                     `http://localhost:3002/api/properties/${id}/similar?radius=${radius}`
                 );
-                console.log("Similar properties response:", similarResponse.data);
                 setSimilarByLocation(similarResponse.data.similarByLocation || []);
                 setSimilarByPrice(similarResponse.data.similarByPrice || []);
 
@@ -149,7 +146,6 @@ const PropertyDetails: React.FC = () => {
         }
     };
 
-    // Function to get user's current location and open directions
     const getDirections = () => {
         if (!property || !property.coordinates) {
             alert("Directions unavailable: Property coordinates are missing.");
@@ -168,8 +164,6 @@ const PropertyDetails: React.FC = () => {
                     const userLon = position.coords.longitude;
                     const propLat = coords[1];
                     const propLon = coords[0];
-
-                    // Construct OpenStreetMap URL with route query
                     const osmUrl = `https://www.openstreetmap.org/directions?engine=graphhopper_car&route=${userLat},${userLon};${propLat},${propLon}#map=12/${propLat}/${propLon}`;
                     window.open(osmUrl, "_blank");
                 },
@@ -195,7 +189,6 @@ const PropertyDetails: React.FC = () => {
         }
     };
 
-    // Function to open OpenStreetMap with the property location
     const openMapLocation = (coordinates: [number, number]) => {
         if (!coordinates) return;
         const [longitude, latitude] = coordinates;
@@ -226,11 +219,10 @@ const PropertyDetails: React.FC = () => {
         );
     }
 
-    // Safely handle coordinates for map and directions
     const mapCenter: LatLngTuple = property.coordinates?.coordinates
         ? [property.coordinates.coordinates[1], property.coordinates.coordinates[0]]
-        : [0, 0]; // Fallback to [0, 0] if coordinates are missing (will be handled by error message)
-    
+        : [0, 0];
+
     const whatsappMessage = `Hi! I'm interested in this property:\n\n🏡 ${property.title}\n💰 Price: $${property.price.toLocaleString()}\n📍 Location: ${property.location}\n\nFacilities:\n${property.facilities
         ?.map((f) => `• ${f.name}: ${f.value}`)
         .join("\n")}\n\n📷 Photo: http://localhost:3002${property.images[0]}`;
@@ -246,6 +238,7 @@ const PropertyDetails: React.FC = () => {
                         src={`http://localhost:3002${property.images[currentImageIndex]}`}
                         alt={`Property image ${currentImageIndex + 1}`}
                         className="property-details-image"
+                        loading="lazy"
                         onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/400x400?text=Image+Not+Found")}
                     />
                     <button onClick={handleNextImage} className="carousel-control next">
@@ -296,11 +289,10 @@ const PropertyDetails: React.FC = () => {
                             ...new Map(
                                 [property, ...similarByLocation, ...similarByPrice]
                                     .filter(Boolean)
-                                    .map((p) => [p._id, p]) // map to [id, property]
-                            ).values(), // extract unique values
+                                    .map((p) => [p._id, p])
+                            ).values(),
                         ]}
                     />
-
                 ) : (
                     <div className="error-message">Map unavailable: Missing coordinates.</div>
                 )}
@@ -332,6 +324,7 @@ const PropertyDetails: React.FC = () => {
                                         src={`http://localhost:3002${similar.images[0]}`}
                                         alt={similar.title}
                                         className="similar-property-image"
+                                        loading="lazy"
                                         onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
                                     />
                                     <div className="similar-property-content">
@@ -379,6 +372,7 @@ const PropertyDetails: React.FC = () => {
                                         src={`http://localhost:3002${similar.images[0]}`}
                                         alt={similar.title}
                                         className="similar-property-image"
+                                        loading="lazy"
                                         onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
                                     />
                                     <div className="similar-property-content">
@@ -410,6 +404,5 @@ const PropertyDetails: React.FC = () => {
         </div>
     );
 };
-
 
 export default PropertyDetails;

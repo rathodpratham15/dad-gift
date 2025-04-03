@@ -53,23 +53,35 @@
     cursor: pointer;
     color: #3b82f6;
     transition: transform 0.3s ease;
-}
-
-.unique-nav-toggle:hover {
-    transform: scale(1.1);
+    padding: 0.5rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Hamburger Menu */
 .unique-hamburger-menu {
-    position: absolute;
-    top: 100%;
+    position: fixed;
+    top: 70px;
     right: 0;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     padding: 1rem;
-    width: 250px;
+    width: 90%;
+    max-width: 300px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.unique-hamburger-menu.closed {
+    transform: translateX(100%);
+}
+
+.unique-hamburger-menu.open {
+    transform: translateX(0);
 }
 
 .hamburger-menu-list {
@@ -86,16 +98,16 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 1rem;
-    color: #374151; /* Gray text */
+    color: #374151;
     cursor: pointer;
+    padding: 0.5rem;
     transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .menu-item:hover {
-    color: #3b82f6; /* Blue on hover */
+    color: #3b82f6;
     background-color: rgba(59, 130, 246, 0.1);
     border-radius: 5px;
-    padding: 0.5rem;
 }
 
 .menu-icon {
@@ -103,6 +115,11 @@
 }
 
 /* Navigation Links */
+.unique-nav-main {
+    display: flex;
+    gap: 2rem;
+}
+
 .unique-nav-link {
     color: #1a1a1a;
     text-decoration: none;
@@ -122,13 +139,37 @@
 }
 
 /* Responsive Styles */
-@media (min-width: 768px) {
+@media (max-width: 768px) {
     .unique-nav-main {
-        display: flex;
-        gap: 2rem;
+        display: none;
     }
-
+    .unique-nav-toggle {
+        display: flex;
+    }
     .unique-hamburger-menu {
         display: block;
+    }
+}
+
+@media (min-width: 769px) {
+    .unique-hamburger-menu {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .unique-nav-container {
+        padding: 0.5rem 1rem;
+    }
+    .unique-nav-logo {
+        font-size: 1.25rem;
+    }
+    .menu-item {
+        font-size: 0.9rem;
+        padding: 0.25rem;
+    }
+    .unique-hamburger-menu {
+        top: 60px;
+        max-width: 250px;
     }
 }

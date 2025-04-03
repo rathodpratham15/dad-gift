@@ -84,6 +84,7 @@ const Home: React.FC = () => {
                         <img
                             src={`http://localhost:3002${config.banner.image}`}
                             alt="Hero Banner"
+                            loading="lazy"
                             onError={(e) =>
                             (e.currentTarget.src =
                                 "https://via.placeholder.com/500x300?text=Banner+Image+Not+Found")
@@ -102,6 +103,7 @@ const Home: React.FC = () => {
                             src="https://d1muf25xaso8hp.cloudfront.net/.../calendar.png"
                             alt="Calendar icon"
                             className="achievement-icon"
+                            loading="lazy"
                         />
                         <h2 className="achievement-number">2000+</h2>
                         <p className="achievement-text">Successful Apartment Tours</p>
@@ -111,6 +113,7 @@ const Home: React.FC = () => {
                             src="https://d1muf25xaso8hp.cloudfront.net/.../house.png"
                             alt="House icon"
                             className="achievement-icon"
+                            loading="lazy"
                         />
                         <h2 className="achievement-number">280+</h2>
                         <p className="achievement-text">Apartments Rented</p>
@@ -120,6 +123,7 @@ const Home: React.FC = () => {
                             src="https://d1muf25xaso8hp.cloudfront.net/.../dance.png"
                             alt="Happy Renters Icon"
                             className="achievement-icon"
+                            loading="lazy"
                         />
                         <h2 className="achievement-number">1100+</h2>
                         <p className="achievement-text">Happy Renters</p>
@@ -131,7 +135,7 @@ const Home: React.FC = () => {
             <div className="process-section">
                 <h1 className="process-title">We take care of your entire renting process!</h1>
                 <div className="process-steps">
-                    {/* (Same process steps as before...) */}
+                    {/* Assuming process steps are similar to previous content */}
                 </div>
                 <div className="process-buttons">
                     <button onClick={() => handleNavigate("/properties")} className="unique-primary-button">
@@ -157,6 +161,7 @@ const Home: React.FC = () => {
                                 src={`http://localhost:3002${city.image}`}
                                 alt={`Houses in ${city.name}`}
                                 className="city-image"
+                                loading="lazy"
                                 onError={(e) =>
                                 (e.currentTarget.src =
                                     "https://via.placeholder.com/300x200?text=Image+Not+Found")
