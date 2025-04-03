@@ -14,6 +14,8 @@ import messagesRoutes from "../service/service/routers/messagesRoutes.js";
 import uploadRoutes from "../service/service/routers/uploadRoutes.js";
 import userViewsRoutes from "../service/service/routers/userViewsRoutes.js";
 import chatRoutes from "../service/service/routers/chat.js";
+import homeConfigRoutes from "./service/routers/homeConfigRoutes.js";
+
 
 dotenv.config();
 
@@ -42,7 +44,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/user-views", userViewsRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/home", homeConfigRoutes);
 console.log("✅ /api/chat route registered");
+
+
 
 // MongoDB connection
 mongoose
