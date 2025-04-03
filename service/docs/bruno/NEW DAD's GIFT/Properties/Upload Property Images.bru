@@ -1,0 +1,19 @@
+meta {
+  name: Upload Property Images
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://localhost:3002/api/properties/upload
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Content-Type: multipart/form-data
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc2MTg2MWMwN2YzOGU3ZTlkY2I1NTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzg1MjQwNDksImV4cCI6MTczODUyNzY0OX0.scJB1NiY2loHykdy_MGUQNqS-8rMPKRF3BWMdT3qIg4
+}

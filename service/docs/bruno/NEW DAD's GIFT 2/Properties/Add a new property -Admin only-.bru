@@ -1,0 +1,26 @@
+meta {
+  name: Add a new property -Admin only-
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/properties
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "",
+    "type": "",
+    "price": "",
+    "location": "",
+    "description": "",
+    "image": ""
+  }
+}

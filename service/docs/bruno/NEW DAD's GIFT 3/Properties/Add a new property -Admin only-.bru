@@ -1,0 +1,28 @@
+meta {
+  name: Add a new property -Admin only-
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3002/api/properties
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc2MTg2MWMwN2YzOGU3ZTlkY2I1NTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzk1OTg1MjIsImV4cCI6MTczOTYwMjEyMn0.H8Gg36TKc6KSwzLjPou9xAD63ecYre5_HVH64JTm5Xk
+}
+
+body:json {
+  {
+    "title": "Bhandup",
+    "type": "Apartment",
+    "price": "2232",
+    "rentPerMonth": "22",
+    "location": "Bhandup",
+    "description": "Hii",
+    "facilities": ["Pool"],
+    "images": []
+  }
+}

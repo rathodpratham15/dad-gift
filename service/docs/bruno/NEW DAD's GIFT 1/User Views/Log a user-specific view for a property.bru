@@ -1,0 +1,18 @@
+meta {
+  name: Log a user-specific view for a property
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/user-views
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "userId": "",
+    "propertyId": ""
+  }
+}

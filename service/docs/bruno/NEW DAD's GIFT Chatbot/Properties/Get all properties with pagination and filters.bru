@@ -1,0 +1,21 @@
+meta {
+  name: Get all properties with pagination and filters
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/properties
+  body: none
+  auth: none
+}
+
+params:query {
+  ~page: 
+  ~limit: 
+  ~minPrice: 
+  ~maxPrice: 
+  ~query: 
+  ~propertyType: 
+  ~city: 
+}

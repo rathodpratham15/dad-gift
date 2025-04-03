@@ -1,0 +1,18 @@
+meta {
+  name: Log property views
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/analytics
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "propertyId": "",
+    "userId": ""
+  }
+}

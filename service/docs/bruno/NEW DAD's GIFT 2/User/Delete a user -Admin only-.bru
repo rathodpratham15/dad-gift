@@ -1,0 +1,19 @@
+meta {
+  name: Delete a user -Admin only-
+  type: http
+  seq: 1
+}
+
+delete {
+  url: http://localhost:3002/api/user/67a909793ee706258e09a6c4
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc2MTg2MWMwN2YzOGU3ZTlkY2I1NTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MzkxMzI4MzYsImV4cCI6MTczOTEzNjQzNn0.VU0ViT7wmUHsBQf37v4Szi18lhtvGcoxfaQxjCIJCos
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc2MTg2MWMwN2YzOGU3ZTlkY2I1NTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MzkxMzI4MzYsImV4cCI6MTczOTEzNjQzNn0.VU0ViT7wmUHsBQf37v4Szi18lhtvGcoxfaQxjCIJCos
+}

@@ -1,0 +1,119 @@
+.enhanced-admin-container {
+    padding: 2rem;
+    background: linear-gradient(to bottom right, #f9fafb, #eef2ff);
+    min-height: 100vh;
+    font-family: "Poppins", sans-serif;
+}
+
+/* ... (rest of the CSS remains unchanged) */
+
+.enhanced-admin-title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.enhanced-admin-subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+.enhanced-admin-form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.enhanced-admin-input,
+.enhanced-admin-select,
+.enhanced-admin-textarea {
+    border: 1px solid #d1d5db;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #1f2937;
+    transition: border-color 0.3s ease;
+}
+
+.enhanced-admin-input:focus,
+.enhanced-admin-select:focus,
+.enhanced-admin-textarea:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+.enhanced-admin-file-upload-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.enhanced-admin-file-upload {
+    font-size: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #374151;
+}
+
+.enhanced-admin-button {
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.enhanced-admin-button:hover {
+    transform: translateY(-2px);
+}
+
+.enhanced-admin-button-blue {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.enhanced-admin-button-blue:hover {
+    background-color: #2563eb;
+}
+
+.enhanced-admin-button-green {
+    background-color: #10b981;
+    color: white;
+}
+
+.enhanced-admin-button-green:hover {
+    background-color: #059669;
+}
+
+.facility-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.facility-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.facility-icon-preview {
+    width: 18px; /* Consistent size for both img and FontAwesome */
+    height: 18px;
+    color: #333; /* For FontAwesome */
+    margin-left: 10px;
+}

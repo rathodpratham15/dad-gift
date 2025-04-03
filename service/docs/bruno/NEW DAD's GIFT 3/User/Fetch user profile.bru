@@ -1,0 +1,15 @@
+meta {
+  name: Fetch user profile
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/user/profile
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

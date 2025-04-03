@@ -1,0 +1,15 @@
+meta {
+  name: Fetch user search history
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/user/search-history
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

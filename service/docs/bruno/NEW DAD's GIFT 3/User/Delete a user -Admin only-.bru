@@ -1,0 +1,19 @@
+meta {
+  name: Delete a user -Admin only-
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{baseUrl}}/api/user/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}

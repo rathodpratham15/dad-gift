@@ -1,0 +1,19 @@
+meta {
+  name: Get similar properties by straight-line distance and price
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/properties/:id/similar
+  body: none
+  auth: none
+}
+
+params:query {
+  ~radius: 
+}
+
+params:path {
+  id: 
+}

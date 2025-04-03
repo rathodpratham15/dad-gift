@@ -1,0 +1,236 @@
+/* src/styles/Home.css */
+.unique-hero-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f5f7fa;
+  padding: 20px;
+}
+
+.unique-hero-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.unique-hero-text {
+  max-width: 50%;
+}
+
+.unique-hero-text h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #333;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.unique-hero-text h1 .highlight-text {
+  color: #007bff;
+}
+
+.unique-hero-text p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.unique-hero-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.unique-primary-button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.unique-primary-button:hover {
+  background-color: #0056b3;
+}
+
+.unique-secondary-button {
+  background-color: transparent;
+  color: #007bff;
+  padding: 12px 24px;
+  border: 2px solid #007bff;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.unique-secondary-button:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.unique-hero-image img {
+  max-width: 100%;
+  height: auto;
+}
+
+.achievements-container {
+  padding: 50px 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.achievements-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+.achievements-grid {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.achievement-item {
+  text-align: center;
+}
+
+.achievement-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.achievement-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.achievement-text {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.process-section {
+  padding: 50px 20px;
+  background: #f5f7fa;
+  text-align: center;
+}
+
+.process-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+.process-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.process-step {
+  max-width: 200px;
+  text-align: center;
+}
+
+.process-icon {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 15px;
+}
+
+.process-step-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.process-step-description {
+  font-size: 1rem;
+  color: #666;
+}
+
+.arrow {
+  font-size: 1.5rem;
+  color: #007bff;
+}
+
+.process-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.cities-section {
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.cities-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+.cities-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.city-card {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.city-card:hover {
+  transform: scale(1.05);
+}
+
+.city-image {
+  width: 300px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.city-name {
+  font-size: 1.2rem;
+  color: #333;
+  margin-top: 10px;
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+  .unique-hero-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .unique-hero-buttons {
+    justify-content: center;
+  }
+
+  .process-steps {
+    flex-direction: column;
+  }
+
+  .arrow {
+    transform: rotate(90deg);
+    margin: 1rem 0;
+  }
+}

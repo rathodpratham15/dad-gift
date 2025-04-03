@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "NEW DAD's GIFT Chatbot",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

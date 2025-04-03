@@ -1,0 +1,15 @@
+meta {
+  name: Get all messages -Admin only-
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/messages
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Upload an image for a property
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/properties/upload
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:multipart-form {
+  image: 
+}

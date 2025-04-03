@@ -1,0 +1,20 @@
+meta {
+  name: Upload multiple images
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:3002/api/properties/upload
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc2MTg2MWMwN2YzOGU3ZTlkY2I1NTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3Mzg1MjYzNTMsImV4cCI6MTczODUyOTk1M30.0v9WAeo2RVTkpYNWuDpuhTbjO9BnPp5ISg5r14BLZVE
+}
+
+body:multipart-form {
+  images: @file(/Users/prathamrathod/Desktop/Screenshot 2025-02-01 at 1.13.48 PM.png)
+  images: @file(/Users/prathamrathod/Desktop/Screenshot 2025-02-01 at 1.47.29 PM.png)
+}

@@ -1,0 +1,30 @@
+meta {
+  name: Update a property -Admin only-
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/api/properties/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "title": "",
+    "type": "",
+    "price": "",
+    "location": "",
+    "description": "",
+    "images": []
+  }
+}

@@ -1,0 +1,30 @@
+meta {
+  name: Update a property -Admin only-
+  type: http
+  seq: 5
+}
+
+put {
+  url: http://localhost:3002/api/properties/:679fd0dc68e9365c747ff7d0
+  body: json
+  auth: bearer
+}
+
+params:path {
+  679fd0dc68e9365c747ff7d0: 
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2Nzc2MTg2MWMwN2YzOGU3ZTlkY2I1NTEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MzkxMjgzNzIsImV4cCI6MTczOTEzMTk3Mn0.q3mlRVWh1hGvgsoIfU8oNSnOSSmVlml8qDkvAoIp88w
+}
+
+body:json {
+  {
+    "title": "",
+    "type": "",
+    "price": "",
+    "location": "",
+    "description": "",
+    "images": []
+  }
+}

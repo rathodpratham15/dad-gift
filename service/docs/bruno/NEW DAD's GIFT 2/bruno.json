@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "NEW DAD's GIFT 2",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

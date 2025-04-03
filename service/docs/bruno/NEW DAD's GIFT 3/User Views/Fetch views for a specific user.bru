@@ -1,0 +1,15 @@
+meta {
+  name: Fetch views for a specific user
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/user-views
+  body: none
+  auth: none
+}
+
+params:query {
+  ~userId: 
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Fetch user profile
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3002/api/user/profile
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2E5MDk3OTNlZTcwNjI1OGUwOWE2YzQiLCJyb2xlIjoidXNlciIsImlhdCI6MTczOTEzNDE1OCwiZXhwIjoxNzM5MTM3NzU4fQ.RsoPyZXWpPR6iNYfl31roNrGUPwVYj5d-csj_-NDmYQ
+}
