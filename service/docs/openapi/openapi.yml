@@ -1198,6 +1198,52 @@ paths:
                   message:
                     type: string
                     example: Missing required fields
+                    
+  /api/auth/google-login:
+    post:
+      summary: Login or register a user with Google OAuth
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: user@example.com
+                name:
+                  type: string
+                  example: John Doe
+              required:
+                - email
+                - name
+      responses:
+        200:
+          description: Google login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: JWT_TOKEN_HERE
+                  role:
+                    type: string
+                    example: user
+        500:
+          description: Server error or login failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Google login failed
 
 components:
   schemas:

@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Signup.css";
+// import { GoogleLogin } from "@react-oauth/google";
+// import { jwtDecode } from "jwt-decode";
 
 const Signup: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -25,7 +27,10 @@ const Signup: React.FC = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:3002/api/auth/register", formData);
+            const response = await axios.post(
+                "http://localhost:3002/api/auth/register",
+                formData
+            );
             if (response.status === 201) {
                 alert("Signup successful! You can now log in.");
                 navigate("/login");
@@ -37,6 +42,26 @@ const Signup: React.FC = () => {
             setLoading(false);
         }
     };
+
+    // const handleGoogleSuccess = async (credentialResponse: any) => {
+    //     try {
+    //         const decoded: any = jwtDecode(credentialResponse.credential);
+    //         const { email, name } = decoded;
+
+    //         const res = await axios.post("http://localhost:3002/api/auth/google-login", {
+    //             email,
+    //             name,
+    //         });
+
+    //         localStorage.setItem("token", res.data.token);
+    //         localStorage.setItem("role", res.data.role);
+
+    //         navigate(res.data.role === "admin" ? "/admin" : "/home");
+    //     } catch (err) {
+    //         console.error("Google signup error:", err);
+    //         setError("Google signup failed.");
+    //     }
+    // };
 
     return (
         <div className="signup-container">
@@ -66,10 +91,17 @@ const Signup: React.FC = () => {
                     onChange={handleChange}
                     className="signup-input"
                 />
+
                 {error && <p className="signup-error">{error}</p>}
+
                 <button type="submit" className="signup-button" disabled={loading}>
                     {loading ? "Registering..." : "Register"}
                 </button>
+
+                {/* <div style={{ margin: "1rem auto" }}>
+                    <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError("Google signup failed")} />
+                </div> */}
+
                 <p className="signup-footer">
                     Already have an account?{" "}
                     <a href="/login" className="signup-link">

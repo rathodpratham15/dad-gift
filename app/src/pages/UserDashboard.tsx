@@ -1,42 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/UserDashboard.css";
 
 interface Property {
     _id: string;
     title: string;
+    type: string;
     price: number;
     location: string;
-    images: string[];
-}
-
-interface SearchHistory {
-    _id: string;
-    query: string;
-    timestamp: string;
+    images: string[]; // Updated for multiple images
 }
 
 const UserDashboard: React.FC = () => {
-    const [favorites, setFavorites] = useState<Property[]>([]);
-    const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
+    const [favoriteProperties, setFavoriteProperties] = useState<Property[]>([]);
+    const [searchHistory, setSearchHistory] = useState<string[]>([]);
+    const [profile, setProfile] = useState({ name: "", email: "" });
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchData = async () => {
             setLoading(true);
             setError(null);
-            try {
-                const token = localStorage.getItem("token");
-                if (!token) {
-                    navigate("/login");
-                    return;
-                }
 
-                const [favoritesResponse, searchHistoryResponse] = await Promise.all([
+            const token = localStorage.getItem("token");
+            if (!token) {
+                setError("You are not logged in.");
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const [profileResponse, favoritesResponse, historyResponse] = await Promise.all([
+                    axios.get("http://localhost:3002/api/user/profile", {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }),
                     axios.get("http://localhost:3002/api/user/favorites", {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
@@ -45,101 +44,128 @@ const UserDashboard: React.FC = () => {
                     }),
                 ]);
 
-                setFavorites(favoritesResponse.data || []);
-                setSearchHistory(searchHistoryResponse.data || []);
+                setProfile(profileResponse.data);
+                setFavoriteProperties(Array.isArray(favoritesResponse.data) ? favoritesResponse.data : []);
+                setSearchHistory(Array.isArray(historyResponse.data) ? historyResponse.data : []);
             } catch (err: any) {
-                console.error("Error fetching user data:", err);
-                setError("Failed to load user data. Please try again.");
+                console.error("Error fetching user data:", err.message);
+                setError("Failed to load data. Please try again later.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUserData();
-    }, [navigate]);
+        fetchData();
+    }, []);
+
+    const handleProfileUpdate = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("You are not logged in.");
+                return;
+            }
+
+            await axios.put(
+                "http://localhost:3002/api/user/profile",
+                profile,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            alert("Profile updated successfully!");
+        } catch (error: any) {
+            console.error("Error updating profile:", error.message);
+            alert("Failed to update profile.");
+        }
+    };
 
     const handleRemoveFavorite = async (propertyId: string) => {
         try {
             const token = localStorage.getItem("token");
+            if (!token) {
+                alert("You are not logged in.");
+                return;
+            }
+
             await axios.delete(`http://localhost:3002/api/user/favorites/${propertyId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setFavorites(favorites.filter((fav) => fav._id !== propertyId));
-            alert("Property removed from favorites!");
-        } catch (err) {
-            console.error("Error removing favorite:", err);
-            alert("Failed to remove property from favorites.");
+            setFavoriteProperties((prev) => prev.filter((property) => property._id !== propertyId));
+        } catch (error: any) {
+            console.error("Error removing favorite:", error.message);
+            alert("Failed to remove favorite property.");
         }
     };
 
-    if (loading) {
-        return <div className="dashboard-loading">Loading...</div>;
-    }
-
-    if (error) {
-        return <div className="dashboard-error">{error}</div>;
-    }
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p className="error-message">{error}</p>;
 
     return (
-        <div className="dashboard-container">
+        <div className="user-dashboard-container">
             <h1 className="dashboard-title">User Dashboard</h1>
 
-            {/* Favorite Properties */}
-            <section className="favorites-section">
-                <h2 className="section-title">Favorite Properties</h2>
-                {favorites.length > 0 ? (
-                    <div className="favorites-grid">
-                        {favorites.map((property) => (
+            {/* Profile Section */}
+            <section className="dashboard-section">
+                <h2>Profile Information</h2>
+                <div className="profile-form">
+                    <input
+                        type="text"
+                        value={profile.name}
+                        onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                        placeholder="Name"
+                        className="profile-input"
+                    />
+                    <input
+                        type="email"
+                        value={profile.email}
+                        onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                        placeholder="Email"
+                        className="profile-input"
+                    />
+                    <button onClick={handleProfileUpdate} className="profile-button">
+                        Update Profile
+                    </button>
+                </div>
+            </section>
+
+            {/* Favorites Section */}
+            <section className="dashboard-section">
+                <h2>Favorite Properties</h2>
+                <div className="favorite-properties">
+                    {favoriteProperties.length > 0 ? (
+                        favoriteProperties.map((property) => (
                             <div key={property._id} className="property-card">
                                 <img
-                                    src={`http://localhost:3002${property.images[0]}`}
+                                    src={`http://localhost:3002${property.images[0]}`} // Fixed image display
                                     alt={property.title}
                                     className="property-image"
-                                    loading="lazy"
-                                    onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
                                 />
-                                <div className="property-info">
-                                    <h3>{property.title}</h3>
-                                    <p>Price: ${property.price.toLocaleString()}</p>
-                                    <p>Location: {property.location}</p>
-                                    <button
-                                        onClick={() => handleRemoveFavorite(property._id)}
-                                        className="remove-favorite-button"
-                                    >
-                                        Remove
-                                    </button>
-                                    <button
-                                        onClick={() => navigate(`/properties/${property._id}`)}
-                                        className="view-details-button"
-                                    >
-                                        View Details
-                                    </button>
-                                </div>
+                                <h3>{property.title}</h3>
+                                <p>{property.location}</p>
+                                <p>${property.price.toLocaleString()}</p>
+                                <button
+                                    onClick={() => handleRemoveFavorite(property._id)}
+                                    className="remove-favorite-button"
+                                >
+                                    Remove from Favorites
+                                </button>
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="no-favorites">No favorite properties yet.</p>
-                )}
+                        ))
+                    ) : (
+                        <p>No favorite properties found.</p>
+                    )}
+                </div>
             </section>
 
             {/* Search History */}
-            <section className="search-history-section">
-                <h2 className="section-title">Search History</h2>
-                {searchHistory.length > 0 ? (
-                    <ul className="search-history-list">
-                        {searchHistory.map((entry) => (
-                            <li key={entry._id} className="search-history-item">
-                                <span>{entry.query}</span>
-                                <span className="timestamp">
-                                    {new Date(entry.timestamp).toLocaleString()}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="no-history">No search history available.</p>
-                )}
+            <section className="dashboard-section">
+                <h2>Search History</h2>
+                <ul className="search-history">
+                    {searchHistory.length > 0 ? (
+                        searchHistory.map((query, index) => <li key={index}>{query}</li>)
+                    ) : (
+                        <p>No search history found.</p>
+                    )}
+                </ul>
             </section>
         </div>
     );

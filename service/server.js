@@ -45,6 +45,7 @@ app.use("/api/user-views", userViewsRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/home", homeConfigRoutes);
+
 console.log("✅ /api/chat route registered");
 
 

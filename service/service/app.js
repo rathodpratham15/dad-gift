@@ -53,6 +53,8 @@ app.use("/api/properties", propertyRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use('/api/auth', require('./routes/auth')); // or your path
+
 
 app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:${process.env.PORT}`);
