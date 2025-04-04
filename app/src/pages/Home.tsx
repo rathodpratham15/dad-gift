@@ -75,12 +75,12 @@ const Home: React.FC = () => {
               >
                 {config.banner.ctaText}
               </button>
-              <button
+              {/* <button
                 onClick={() => handleNavigate("/roommates")}
                 className="unique-secondary-button"
               >
                 Find Roommates
-              </button>
+              </button> */}
             </div>
           </div>
           <div className="unique-hero-image">
@@ -140,9 +140,9 @@ const Home: React.FC = () => {
           <button onClick={() => handleNavigate("/properties")} className="unique-primary-button">
             Find my Home
           </button>
-          <button onClick={() => handleNavigate("/roommates")} className="unique-secondary-button">
+          {/* <button onClick={() => handleNavigate("/roommates")} className="unique-secondary-button">
             Find Roommates
-          </button>
+          </button> */}
         </div>
       </div>
 
