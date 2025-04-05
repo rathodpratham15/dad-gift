@@ -39,6 +39,8 @@ import propertyRoutes from './service/routers/propertyRoutes';
 import userRoutes from './service/routers/userRoutes';
 import analyticsRoutes from './service/routers/analyticsRoutes';
 import connectDB from './service/config/db';
+import resetPasswordRoutes from "./routes/resetPasswordRoutes.js";
+
 
 config();
 connectDB();
@@ -54,6 +56,8 @@ app.use("/api/user", userRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use('/api/auth', require('./routes/auth')); // or your path
+app.use("/api/auth", resetPasswordRoutes);
+
 
 
 app.listen(process.env.PORT, () => {

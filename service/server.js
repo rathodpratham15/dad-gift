@@ -15,6 +15,11 @@ import uploadRoutes from "../service/service/routers/uploadRoutes.js";
 import userViewsRoutes from "../service/service/routers/userViewsRoutes.js";
 import chatRoutes from "../service/service/routers/chat.js";
 import homeConfigRoutes from "./service/routers/homeConfigRoutes.js";
+import resetPasswordRoutes from "./service/routers/resetPasswordRoutes.js"; // ✅ path from root
+import notificationRoutes from "./service/routers/notificationRoutes.js"; // Adjust if needed
+
+
+
 
 
 dotenv.config();
@@ -45,6 +50,10 @@ app.use("/api/user-views", userViewsRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/home", homeConfigRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+// Add after other routes:
+app.use("/api/auth", resetPasswordRoutes); // ✅ this will make POST /api/auth/reset-password available
 
 console.log("✅ /api/chat route registered");
 

@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Signup.css";
-// import { GoogleLogin } from "@react-oauth/google";
-// import { jwtDecode } from "jwt-decode";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 const Signup: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -12,9 +12,22 @@ const Signup: React.FC = () => {
         email: "",
         password: "",
     });
+
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+
+    const validateEmail = (email: string) => /\S+@\S+\.\S+/.test(email);
+
+    const passwordChecks = {
+        length: formData.password.length >= 8,
+        uppercase: /[A-Z]/.test(formData.password),
+        lowercase: /[a-z]/.test(formData.password),
+        number: /[0-9]/.test(formData.password),
+        specialChar: /[!@#$%^&*]/.test(formData.password),
+    };
+
+    const allValid = Object.values(passwordChecks).every(Boolean);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -26,11 +39,20 @@ const Signup: React.FC = () => {
         setError("");
         setLoading(true);
 
+        if (!validateEmail(formData.email)) {
+            setError("Please enter a valid email.");
+            setLoading(false);
+            return;
+        }
+
+        if (!allValid) {
+            setError("Password does not meet all requirements.");
+            setLoading(false);
+            return;
+        }
+
         try {
-            const response = await axios.post(
-                "http://localhost:3002/api/auth/register",
-                formData
-            );
+            const response = await axios.post("http://localhost:3002/api/auth/register", formData);
             if (response.status === 201) {
                 alert("Signup successful! You can now log in.");
                 navigate("/login");
@@ -43,30 +65,31 @@ const Signup: React.FC = () => {
         }
     };
 
-    // const handleGoogleSuccess = async (credentialResponse: any) => {
-    //     try {
-    //         const decoded: any = jwtDecode(credentialResponse.credential);
-    //         const { email, name } = decoded;
+    const handleGoogleSuccess = async (credentialResponse: any) => {
+        try {
+            const decoded: any = jwtDecode(credentialResponse.credential);
+            const { email, name } = decoded;
 
-    //         const res = await axios.post("http://localhost:3002/api/auth/google-login", {
-    //             email,
-    //             name,
-    //         });
+            const res = await axios.post("http://localhost:3002/api/auth/google-login", {
+                email,
+                name,
+            });
 
-    //         localStorage.setItem("token", res.data.token);
-    //         localStorage.setItem("role", res.data.role);
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("role", res.data.role);
 
-    //         navigate(res.data.role === "admin" ? "/admin" : "/home");
-    //     } catch (err) {
-    //         console.error("Google signup error:", err);
-    //         setError("Google signup failed.");
-    //     }
-    // };
+            navigate(res.data.role === "admin" ? "/admin" : "/home");
+        } catch (err) {
+            console.error("Google signup error:", err);
+            setError("Google signup failed.");
+        }
+    };
 
     return (
         <div className="signup-container">
             <form className="signup-form" onSubmit={handleSubmit}>
                 <h1 className="signup-title">Sign-Up</h1>
+
                 <input
                     type="text"
                     name="name"
@@ -74,7 +97,9 @@ const Signup: React.FC = () => {
                     value={formData.name}
                     onChange={handleChange}
                     className="signup-input"
+                    required
                 />
+
                 <input
                     type="email"
                     name="email"
@@ -82,7 +107,9 @@ const Signup: React.FC = () => {
                     value={formData.email}
                     onChange={handleChange}
                     className="signup-input"
+                    required
                 />
+
                 <input
                     type="password"
                     name="password"
@@ -90,7 +117,29 @@ const Signup: React.FC = () => {
                     value={formData.password}
                     onChange={handleChange}
                     className="signup-input"
+                    required
                 />
+
+                <div className="password-requirements">
+                    <p>Password must include:</p>
+                    <ul>
+                        <li className={passwordChecks.length ? "valid" : "invalid"}>
+                            ✔ At least 8 characters
+                        </li>
+                        <li className={passwordChecks.uppercase ? "valid" : "invalid"}>
+                            ✔ Uppercase letter
+                        </li>
+                        <li className={passwordChecks.lowercase ? "valid" : "invalid"}>
+                            ✔ Lowercase letter
+                        </li>
+                        <li className={passwordChecks.number ? "valid" : "invalid"}>
+                            ✔ Number
+                        </li>
+                        <li className={passwordChecks.specialChar ? "valid" : "invalid"}>
+                            ✔ Special character (!@#$%^&*)
+                        </li>
+                    </ul>
+                </div>
 
                 {error && <p className="signup-error">{error}</p>}
 
@@ -98,9 +147,9 @@ const Signup: React.FC = () => {
                     {loading ? "Registering..." : "Register"}
                 </button>
 
-                {/* <div style={{ margin: "1rem auto" }}>
+                <div className="google-button-wrapper">
                     <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setError("Google signup failed")} />
-                </div> */}
+                </div>
 
                 <p className="signup-footer">
                     Already have an account?{" "}

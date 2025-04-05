@@ -1,11 +1,13 @@
+// Login.tsx
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import axios from "axios";
 import { Eye, EyeOff, LogIn } from "lucide-react";
-// import { GoogleLogin } from "@react-oauth/google";
-// import { jwtDecode } from "jwt-decode";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
 
 interface LoginProps {
     onLogin: () => void;
@@ -52,38 +54,41 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 localStorage.removeItem("remember_pass");
             }
 
+            toast.success("Logged in successfully!");
             onLogin();
             navigate(response.data.role === "admin" ? "/admin" : "/home");
         } catch (err: any) {
             console.error("Login Error:", err.response?.data || err.message);
+            toast.error("Invalid email or password!");
             setError("Invalid email or password!");
         } finally {
             setLoading(false);
         }
     };
 
-    // const handleGoogleLogin = async (credentialResponse: any) => {
-    //     try {
-    //         const decoded: any = jwtDecode(credentialResponse.credential);
-    //         const googleEmail = decoded.email;
-    //         const name = decoded.name;
+    const handleGoogleLogin = async (credentialResponse: any) => {
+        try {
+            const decoded: any = jwtDecode(credentialResponse.credential);
+            const googleEmail = decoded.email;
+            const name = decoded.name;
 
-    //         // Send this to your backend for token-based login/register
-    //         const res = await axios.post("http://localhost:3002/api/auth/google-login", {
-    //             email: googleEmail,
-    //             name: name,
-    //         });
+            const res = await axios.post("http://localhost:3002/api/auth/google-login", {
+                email: googleEmail,
+                name: name,
+            });
 
-    //         localStorage.setItem("token", res.data.token);
-    //         localStorage.setItem("role", res.data.role);
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("role", res.data.role);
 
-    //         onLogin();
-    //         navigate(res.data.role === "admin" ? "/admin" : "/home");
-    //     } catch (err) {
-    //         console.error("Google Login Failed", err);
-    //         setError("Google login failed");
-    //     }
-    // };
+            toast.success(`Welcome back, ${name}!`);
+            onLogin();
+            navigate(res.data.role === "admin" ? "/admin" : "/home");
+        } catch (err) {
+            console.error("Google Login Failed", err);
+            toast.error("Google Sign-In failed");
+            setError("Google login failed");
+        }
+    };
 
     return (
         <div className="enhanced-login-container">
@@ -132,13 +137,13 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             id="remember"
                         />
                         <label htmlFor="remember">Remember me</label>
-                        {/* <button
+                        <button
                             className="forgot-password-link"
                             type="button"
                             onClick={() => navigate("/forgot-password")}
                         >
                             Forgot password?
-                        </button> */}
+                        </button>
                     </div>
 
                     {error && <p className="enhanced-login-error">{error}</p>}
@@ -154,12 +159,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                     <div className="or-divider">OR</div>
 
-                    {/* <div className="google-oauth-wrapper">
+                    <div className="google-oauth-wrapper">
                         <GoogleLogin
                             onSuccess={handleGoogleLogin}
-                            onError={() => setError("Google Sign In failed")}
+                            onError={() => {
+                                toast.error("Google Sign-In failed");
+                                setError("Google Sign-In failed");
+                            }}
                         />
-                    </div> */}
+                    </div>
                 </form>
 
                 <div className="enhanced-login-footer">

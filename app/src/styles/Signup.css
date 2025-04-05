@@ -94,6 +94,54 @@ body {
   color: #2563eb;
 }
 
+.password-requirements {
+  margin-top: -0.5rem;
+  font-size: 0.85rem;
+  text-align: left;
+  color: #6b7280;
+}
+
+.password-requirements ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.5rem;
+}
+
+.password-requirements li {
+  margin-bottom: 0.25rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.password-requirements li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+}
+
+.password-requirements .valid {
+  color: green;
+  font-weight: 500;
+}
+
+.password-requirements .invalid {
+  color: #ef4444;
+}
+
+/* Dark mode overrides */
+body.dark .password-requirements {
+  color: #cbd5e1;
+}
+
+body.dark .password-requirements .valid {
+  color: #4ade80;
+}
+
+body.dark .password-requirements .invalid {
+  color: #f87171;
+}
+
+
 /* === Dark Mode Overrides === */
 body.dark {
   background: linear-gradient(to bottom right, #0f172a, #1e293b);

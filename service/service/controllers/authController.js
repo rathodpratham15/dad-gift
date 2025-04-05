@@ -55,11 +55,11 @@
 //     }
 // };
 
-
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/UserModel.js';
 
+// Register a user
 export const register = async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -88,6 +88,7 @@ export const register = async (req, res) => {
     }
 };
 
+// Login a user
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -97,14 +98,17 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
+        // ✅ Ensure we await this Promise to get actual result
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
-            expiresIn: '1h',
-        });
+        const token = jwt.sign(
+            { userId: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
 
         res.status(200).json({ token, role: user.role });
     } catch (error) {
@@ -113,32 +117,33 @@ export const login = async (req, res) => {
     }
 };
 
-// ✅ Google Login Controller
+// Google Login Controller
 export const googleLogin = async (req, res) => {
     const { email, name } = req.body;
 
     try {
         let user = await User.findOne({ email });
 
-        // Auto-register Google user if not found
         if (!user) {
             user = new User({
                 email,
                 name,
-                password: '', // or some dummy value
+                password: '',
                 role: 'user',
                 provider: 'google',
             });
             await user.save();
         }
 
-        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, {
-            expiresIn: '1d',
-        });
+        const token = jwt.sign(
+            { userId: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
 
         res.status(200).json({ token, role: user.role });
     } catch (error) {
-        console.error("Google login error:", error);
-        res.status(500).json({ message: "Google login failed" });
+        console.error('Google login error:', error);
+        res.status(500).json({ message: 'Google login failed' });
     }
 };

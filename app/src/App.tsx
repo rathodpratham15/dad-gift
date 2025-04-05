@@ -11,6 +11,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddToHomeScreen from "./components/AddToHomeScreen";
 import ChatBot from "./components/Chatbot";
@@ -19,7 +21,10 @@ import Onboarding from "./components/Onboarding";
 import AuthEntry from "./components/AuthEntry";
 import axios from "axios";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
+// import useNotifications from "./hooks/useNotifications";
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -55,9 +60,13 @@ function App() {
     document.body.classList.toggle("dark", theme === "dark");
   }, []);
 
+  // 🚀 Hook that fetches toast notifications
+  // useNotifications();
+
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <Router>
+        <ToastContainer position="top-right" autoClose={3000} />
         <Header isAdmin={isAdmin} onLogout={updateAdminStatus} />
         <Routes>
           <Route path="/" element={<Splash />} />
@@ -65,6 +74,8 @@ function App() {
           <Route path="/auth" element={<AuthEntry />} />
           <Route path="/login" element={<Login onLogin={updateAdminStatus} />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/home" element={<Home />} />
           <Route path="/properties" element={<PropertyListings />} />
           <Route path="/properties/:id" element={<PropertyDetails />} />
