@@ -5,7 +5,6 @@ import WhatsAppButton from "../components/WhatsAppButton";
 import "../styles/Home.css";
 import Onboarding from "../components/Onboarding";
 
-
 interface City {
   name: string;
   image: string;
@@ -24,6 +23,8 @@ interface HomeConfig {
   cities: City[];
 }
 
+const API = import.meta.env.VITE_API_URL;
+
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [config, setConfig] = useState<HomeConfig | null>(null);
@@ -32,7 +33,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const res = await axios.get("http://localhost:3002/api/home");
+        const res = await axios.get(`${API}/api/home`);
         setConfig(res.data);
       } catch (err) {
         console.error("Failed to fetch homepage config:", err);
@@ -62,7 +63,7 @@ const Home: React.FC = () => {
   return (
     <div>
       {/* Banner Section */}
-          <Onboarding />
+      <Onboarding />
       <div className="unique-hero-section">
         <div className="unique-hero-content">
           <div className="unique-hero-text">
@@ -75,21 +76,15 @@ const Home: React.FC = () => {
               >
                 {config.banner.ctaText}
               </button>
-              {/* <button
-                onClick={() => handleNavigate("/roommates")}
-                className="unique-secondary-button"
-              >
-                Find Roommates
-              </button> */}
             </div>
           </div>
           <div className="unique-hero-image">
             <img
-              src={`http://localhost:3002${config.banner.image}`}
+              src={`${API}${config.banner.image}`}
               alt="Hero Banner"
               onError={(e) =>
-                (e.currentTarget.src =
-                  "https://via.placeholder.com/500x300?text=Banner+Image+Not+Found")
+              (e.currentTarget.src =
+                "https://via.placeholder.com/500x300?text=Banner+Image+Not+Found")
               }
             />
           </div>
@@ -133,16 +128,11 @@ const Home: React.FC = () => {
       {/* Process Section */}
       <div className="process-section">
         <h1 className="process-title">We take care of your entire renting process!</h1>
-        <div className="process-steps">
-          {/* (Same process steps as before...) */}
-        </div>
+        <div className="process-steps">{/* ... */}</div>
         <div className="process-buttons">
           <button onClick={() => handleNavigate("/properties")} className="unique-primary-button">
             Find my Home
           </button>
-          {/* <button onClick={() => handleNavigate("/roommates")} className="unique-secondary-button">
-            Find Roommates
-          </button> */}
         </div>
       </div>
 
@@ -157,12 +147,12 @@ const Home: React.FC = () => {
               onClick={() => handleCityClick(city.name)}
             >
               <img
-                src={`http://localhost:3002${city.image}`}
+                src={`${API}${city.image}`}
                 alt={`Houses in ${city.name}`}
                 className="city-image"
                 onError={(e) =>
-                  (e.currentTarget.src =
-                    "https://via.placeholder.com/300x200?text=Image+Not+Found")
+                (e.currentTarget.src =
+                  "https://via.placeholder.com/300x200?text=Image+Not+Found")
                 }
               />
               <p className="city-name">Houses in {city.name}</p>

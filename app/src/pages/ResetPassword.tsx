@@ -8,6 +8,8 @@ import axios, { AxiosError } from "axios";
 import Lottie from "lottie-react";
 import successAnimation from "../assets/success.json";
 
+const API = import.meta.env.VITE_API_URL;
+
 const ResetPassword: React.FC = () => {
     const [params] = useSearchParams();
     const token = params.get("token");
@@ -47,7 +49,7 @@ const ResetPassword: React.FC = () => {
 
         try {
             setLoading(true);
-            await axios.post("http://localhost:3002/api/auth/reset-password", {
+            await axios.post(`${API}/api/auth/reset-password`, {
                 token,
                 newPassword,
             });

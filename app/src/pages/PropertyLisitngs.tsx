@@ -8,6 +8,8 @@ import Facilities from "../components/Facilities";
 import WhatsAppButton from "../components/WhatsAppButton";
 import AddToHomeScreenButton from "./../components/AddToHomeScreen";
 
+const API = import.meta.env.VITE_API_URL;
+
 interface Property {
     _id: string;
     title: string;
@@ -51,9 +53,7 @@ const PropertyListings: React.FC = () => {
                 if (propertyType) params.propertyType = propertyType;
                 if (city) params.city = city;
 
-                const response = await axios.get("http://localhost:3002/api/properties", {
-                    params,
-                });
+                const response = await axios.get(`${API}/api/properties`, { params });
 
                 setProperties(response.data.properties || []);
                 setTotalPages(Math.ceil((response.data.total || 0) / propertiesPerPage));
@@ -125,7 +125,7 @@ const PropertyListings: React.FC = () => {
                                     <div className="unique-property-card">
                                         {property.images && property.images.length > 0 ? (
                                             <img
-                                                src={`http://localhost:3002${property.images[0]}`}
+                                                src={`${API}${property.images[0]}`}
                                                 alt={property.title}
                                                 className="unique-property-card-img"
                                             />

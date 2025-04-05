@@ -13,6 +13,8 @@ interface LoginProps {
     onLogin: () => void;
 }
 
+const API = import.meta.env.VITE_API_URL;
+
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -38,7 +40,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         setError("");
 
         try {
-            const response = await axios.post("http://localhost:3002/api/auth/login", {
+            const response = await axios.post(`${API}/api/auth/login`, {
                 email,
                 password,
             });
@@ -72,7 +74,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             const googleEmail = decoded.email;
             const name = decoded.name;
 
-            const res = await axios.post("http://localhost:3002/api/auth/google-login", {
+            const res = await axios.post(`${API}/api/auth/google-login`, {
                 email: googleEmail,
                 name: name,
             });

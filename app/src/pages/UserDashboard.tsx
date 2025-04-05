@@ -3,13 +3,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/UserDashboard.css";
 
+const API = import.meta.env.VITE_API_URL;
+
 interface Property {
     _id: string;
     title: string;
     type: string;
     price: number;
     location: string;
-    images: string[]; // Updated for multiple images
+    images: string[];
 }
 
 const UserDashboard: React.FC = () => {
@@ -33,13 +35,13 @@ const UserDashboard: React.FC = () => {
 
             try {
                 const [profileResponse, favoritesResponse, historyResponse] = await Promise.all([
-                    axios.get("http://localhost:3002/api/user/profile", {
+                    axios.get(`${API}/api/user/profile`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
-                    axios.get("http://localhost:3002/api/user/favorites", {
+                    axios.get(`${API}/api/user/favorites`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
-                    axios.get("http://localhost:3002/api/user/search-history", {
+                    axios.get(`${API}/api/user/search-history`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
                 ]);
@@ -66,11 +68,10 @@ const UserDashboard: React.FC = () => {
                 return;
             }
 
-            await axios.put(
-                "http://localhost:3002/api/user/profile",
-                profile,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await axios.put(`${API}/api/user/profile`, profile, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
             alert("Profile updated successfully!");
         } catch (error: any) {
             console.error("Error updating profile:", error.message);
@@ -86,9 +87,10 @@ const UserDashboard: React.FC = () => {
                 return;
             }
 
-            await axios.delete(`http://localhost:3002/api/user/favorites/${propertyId}`, {
+            await axios.delete(`${API}/api/user/favorites/${propertyId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+
             setFavoriteProperties((prev) => prev.filter((property) => property._id !== propertyId));
         } catch (error: any) {
             console.error("Error removing favorite:", error.message);
@@ -135,9 +137,13 @@ const UserDashboard: React.FC = () => {
                         favoriteProperties.map((property) => (
                             <div key={property._id} className="property-card">
                                 <img
-                                    src={`http://localhost:3002${property.images[0]}`} // Fixed image display
+                                    src={`${API}${property.images[0]}`}
                                     alt={property.title}
                                     className="property-image"
+                                    onError={(e) =>
+                                    (e.currentTarget.src =
+                                        "https://via.placeholder.com/300x200?text=Image+Not+Found")
+                                    }
                                 />
                                 <h3>{property.title}</h3>
                                 <p>{property.location}</p>

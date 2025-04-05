@@ -6,6 +6,8 @@ import "../styles/Signup.css";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 
+const API = import.meta.env.VITE_API_URL;
+
 const Signup: React.FC = () => {
     const [formData, setFormData] = useState({
         name: "",
@@ -52,7 +54,7 @@ const Signup: React.FC = () => {
         }
 
         try {
-            const response = await axios.post("http://localhost:3002/api/auth/register", formData);
+            const response = await axios.post(`${API}/api/auth/register`, formData);
             if (response.status === 201) {
                 alert("Signup successful! You can now log in.");
                 navigate("/login");
@@ -70,7 +72,7 @@ const Signup: React.FC = () => {
             const decoded: any = jwtDecode(credentialResponse.credential);
             const { email, name } = decoded;
 
-            const res = await axios.post("http://localhost:3002/api/auth/google-login", {
+            const res = await axios.post(`${API}/api/auth/google-login`, {
                 email,
                 name,
             });

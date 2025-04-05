@@ -26,6 +26,8 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 // import useNotifications from "./hooks/useNotifications";
 
+const API = import.meta.env.VITE_API_URL;
+
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -43,7 +45,7 @@ function App() {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const response = await axios.get("http://localhost:3002/api/user/profile", {
+          const response = await axios.get(`${API}/api/user/profile`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setIsAdmin(response.data.role === "admin");
@@ -59,9 +61,6 @@ function App() {
     const theme = localStorage.getItem("theme") || "light";
     document.body.classList.toggle("dark", theme === "dark");
   }, []);
-
-  // 🚀 Hook that fetches toast notifications
-  // useNotifications();
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>

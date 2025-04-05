@@ -9,6 +9,8 @@ import { MapContainer, TileLayer, Marker, MapContainerProps } from "react-leafle
 import "leaflet/dist/leaflet.css";
 import { LatLngExpression, LatLngTuple } from "leaflet";
 
+const API = import.meta.env.VITE_API_URL;
+
 interface Property {
     _id: string;
     title: string;
@@ -54,7 +56,6 @@ const PropertyDetails: React.FC = () => {
 
     useEffect(() => {
         if (!id || !/^[0-9a-fA-F]{24}$/.test(id)) {
-            console.error("Invalid property ID format:", id);
             setError("Invalid property ID format.");
             setLoading(false);
             navigate("/properties");
@@ -65,39 +66,27 @@ const PropertyDetails: React.FC = () => {
             setLoading(true);
             setError(null);
             try {
-                console.log("Fetching property with ID:", id);
-                const propertyResponse = await axios.get(`http://localhost:3002/api/properties/${id}`);
-                console.log("Property response:", propertyResponse.data);
+                const propertyResponse = await axios.get(`${API}/api/properties/${id}`);
                 const propertyData = propertyResponse.data;
-                if (!propertyData.coordinates?.coordinates) {
-                    if (propertyData.coordinatesWarning) {
-                        console.warn("Property missing coordinates, map may not display correctly.");
-                    } else {
-                        throw new Error("Property is missing coordinates.");
-                    }
+
+                if (!propertyData.coordinates?.coordinates && !propertyData.coordinatesWarning) {
+                    throw new Error("Property is missing coordinates.");
                 }
+
                 setProperty(propertyData);
 
-                const similarResponse = await axios.get(
-                    `http://localhost:3002/api/properties/${id}/similar?radius=${radius}`
-                );
-                console.log("Similar properties response:", similarResponse.data);
+                const similarResponse = await axios.get(`${API}/api/properties/${id}/similar?radius=${radius}`);
                 setSimilarByLocation(similarResponse.data.similarByLocation || []);
                 setSimilarByPrice(similarResponse.data.similarByPrice || []);
 
                 if (isLoggedIn) {
                     await axios.post(
-                        "http://localhost:3002/api/analytics",
+                        `${API}/api/analytics`,
                         { propertyId: id },
                         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
                     );
                 }
             } catch (error: any) {
-                console.error("Error fetching property details:", {
-                    message: error.message,
-                    status: error.response?.status,
-                    data: error.response?.data,
-                });
                 setError(
                     error.response?.data?.message ||
                     "Failed to load property details. It may not exist or the server is unreachable."
@@ -120,13 +109,12 @@ const PropertyDetails: React.FC = () => {
         if (!property) return;
         try {
             await axios.post(
-                "http://localhost:3002/api/user/favorites",
+                `${API}/api/user/favorites`,
                 { propertyId: property._id },
                 { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
             );
             alert("Property added to favorites!");
         } catch (error: any) {
-            console.error("Error adding to favorites:", error.message);
             if (axios.isAxiosError(error) && error.response?.status === 409) {
                 alert("Property is already in your favorites.");
             } else {
@@ -137,151 +125,98 @@ const PropertyDetails: React.FC = () => {
 
     const handleNextImage = () => {
         if (property && property.images.length > 0) {
-            setCurrentImageIndex((prevIndex) => (prevIndex + 1) % property.images.length);
+            setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
         }
     };
 
     const handlePreviousImage = () => {
         if (property && property.images.length > 0) {
-            setCurrentImageIndex(
-                (prevIndex) => (prevIndex - 1 + property.images.length) % property.images.length
-            );
+            setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length);
         }
     };
 
-    // Function to get user's current location and open directions
     const getDirections = () => {
-        if (!property || !property.coordinates) {
-            alert("Directions unavailable: Property coordinates are missing.");
-            return;
-        }
+        if (!property || !property.coordinates?.coordinates) return;
         const coords = property.coordinates.coordinates;
-        if (!coords) {
-            alert("Directions unavailable: Property coordinates are invalid.");
-            return;
-        }
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const userLat = position.coords.latitude;
-                    const userLon = position.coords.longitude;
-                    const propLat = coords[1];
-                    const propLon = coords[0];
-
-                    // Construct OpenStreetMap URL with route query
-                    const osmUrl = `https://www.openstreetmap.org/directions?engine=graphhopper_car&route=${userLat},${userLon};${propLat},${propLon}#map=12/${propLat}/${propLon}`;
-                    window.open(osmUrl, "_blank");
-                },
-                (error) => {
-                    console.error("Geolocation error:", error.message);
-                    const propLat = coords[1];
-                    const propLon = coords[0];
-                    alert(
-                        "Unable to get your location. Please enable location services or enter your location manually. " +
-                        "You can copy this property location: " +
-                        `${propLat},${propLon}`
-                    );
-                    const osmUrl = `https://www.openstreetmap.org/?mlat=${propLat}&mlon=${propLon}#map=12/${propLat}/${propLon}`;
-                    window.open(osmUrl, "_blank");
-                }
-            );
-        } else {
-            const propLat = coords[1];
-            const propLon = coords[0];
-            alert("Geolocation is not supported by this browser. Please enter your location manually.");
-            const osmUrl = `https://www.openstreetmap.org/?mlat=${propLat}&mlon=${propLon}#map=12/${propLat}/${propLon}`;
-            window.open(osmUrl, "_blank");
-        }
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+                const propLat = coords[1];
+                const propLon = coords[0];
+                const osmUrl = `https://www.openstreetmap.org/directions?engine=graphhopper_car&route=${userLat},${userLon};${propLat},${propLon}#map=12/${propLat}/${propLon}`;
+                window.open(osmUrl, "_blank");
+            },
+            () => {
+                const [lon, lat] = coords;
+                const fallbackUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=12/${lat}/${lon}`;
+                alert(`Unable to fetch location. You can view this property here:\n${fallbackUrl}`);
+                window.open(fallbackUrl, "_blank");
+            }
+        );
     };
 
-    // Function to open OpenStreetMap with the property location
     const openMapLocation = (coordinates: [number, number]) => {
-        if (!coordinates) return;
-        const [longitude, latitude] = coordinates;
-        const osmUrl = `https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=14/${latitude}/${longitude}`;
-        window.open(osmUrl, "_blank");
+        const [lon, lat] = coordinates;
+        const url = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`;
+        window.open(url, "_blank");
     };
 
     if (loading) {
-        return (
-            <div className="property-details-container">
-                <div className="loading-spinner">Loading...</div>
-            </div>
-        );
+        return <div className="property-details-container"><div className="loading-spinner">Loading...</div></div>;
     }
 
     if (error || !property) {
         return (
             <div className="property-details-container">
-                <div className="error-message">
-                    {error || "Property data is unavailable."}
-                    <br />
-                    <small>Please check the property ID or try again later.</small>
-                </div>
-                <button onClick={() => navigate("/properties")} className="back-to-listings-button">
-                    Back to Listings
-                </button>
+                <div className="error-message">{error || "Property data is unavailable."}</div>
+                <button onClick={() => navigate("/properties")} className="back-to-listings-button">Back to Listings</button>
             </div>
         );
     }
 
-    // Safely handle coordinates for map and directions
     const mapCenter: LatLngTuple = property.coordinates?.coordinates
         ? [property.coordinates.coordinates[1], property.coordinates.coordinates[0]]
-        : [0, 0]; // Fallback to [0, 0] if coordinates are missing (will be handled by error message)
+        : [0, 0];
 
-    const whatsappMessage = `Hi! I'm interested in this property:\n\n🏡 ${property.title}\n💰 Price: $${property.price.toLocaleString()}\n📍 Location: ${property.location}\n\nFacilities:\n${property.facilities
-        ?.map((f) => `• ${f.name}: ${f.value}`)
-        .join("\n")}\n\n📷 Photo: http://localhost:3002${property.images[0]}`;
+    const whatsappMessage = `Hi! I'm interested in this property:\n\n🏡 ${property.title}\n💰 Price: $${property.price.toLocaleString()}\n📍 Location: ${property.location}\n\nFacilities:\n${property.facilities?.map((f) => `• ${f.name}: ${f.value}`).join("\n")}\n\n📷 Photo: ${API}${property.images[0]}`;
 
     return (
         <div className="property-details-container">
             <div className="property-details-card">
                 <div className="property-images-carousel">
-                    <button onClick={handlePreviousImage} className="carousel-control prev">
-                        ◀
-                    </button>
+                    <button onClick={handlePreviousImage} className="carousel-control prev">◀</button>
                     <img
-                        src={`http://localhost:3002${property.images[currentImageIndex]}`}
+                        src={`${API}${property.images[currentImageIndex]}`}
                         alt={`Property image ${currentImageIndex + 1}`}
                         className="property-details-image"
                         onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/400x400?text=Image+Not+Found")}
                     />
-                    <button onClick={handleNextImage} className="carousel-control next">
-                        ▶
-                    </button>
+                    <button onClick={handleNextImage} className="carousel-control next">▶</button>
                 </div>
+
                 <div className="property-details-content">
                     <h1 className="property-details-title">{property.title}</h1>
                     <p className="property-details-price">Price: ${property.price.toLocaleString()}</p>
                     <p className="property-details-type">Type: {property.type}</p>
-                    <p>
-                        <strong>Rent Per Month:</strong>{" "}
-                        {property.rentPerMonth ? `$${property.rentPerMonth.toLocaleString()}` : "N/A"}
-                    </p>
+                    <p><strong>Rent Per Month:</strong> {property.rentPerMonth ? `$${property.rentPerMonth.toLocaleString()}` : "N/A"}</p>
                     <p className="property-details-location">Location: {property.location}</p>
-                    {property.facilities && property.facilities.length > 0 && (
+
+                    {(property.facilities?.length ?? 0) > 0 && (
                         <>
                             <h3 className="mt-6 text-xl font-semibold text-center">Facilities</h3>
-                            <Facilities facilities={property.facilities} />
+                            <Facilities facilities={property.facilities || []} />
                         </>
                     )}
+
                     <p className="property-details-description">Description: {property.description}</p>
+
                     <div className="property-details-buttons">
-                        <button
-                            onClick={() => navigate("/properties")}
-                            className="back-to-listings-button"
-                        >
-                            Back to Listings
-                        </button>
-                        <button onClick={handleAddToFavorites} className="favorite-button">
-                            Mark as Favorite
-                        </button>
+                        <button onClick={() => navigate("/properties")} className="back-to-listings-button">Back</button>
+                        <button onClick={handleAddToFavorites} className="favorite-button">Mark as Favorite</button>
                         {property.coordinates?.coordinates && (
-                            <button onClick={getDirections} className="directions-button">
-                                Get Directions
-                            </button>
+                            <button onClick={getDirections} className="directions-button">Get Directions</button>
                         )}
                     </div>
                 </div>
@@ -294,16 +229,14 @@ const PropertyDetails: React.FC = () => {
                         center={mapCenter}
                         properties={[
                             ...new Map(
-                                [property, ...similarByLocation, ...similarByPrice]
-                                    .filter(Boolean)
-                                    .map((p) => [p._id, p]) // map to [id, property]
-                            ).values(), // extract unique values
+                                [property, ...similarByLocation, ...similarByPrice].map((p) => [p._id, p])
+                            ).values(),
                         ]}
                     />
-
                 ) : (
                     <div className="error-message">Map unavailable: Missing coordinates.</div>
                 )}
+
                 <div className="radius-select">
                     <label>Radius (miles): </label>
                     <select value={radius} onChange={(e) => setRadius(parseInt(e.target.value))}>
@@ -314,102 +247,97 @@ const PropertyDetails: React.FC = () => {
                 </div>
             </div>
 
+            {/* Similar by Location */}
             {similarByLocation.length > 0 && (
                 <div className="similar-properties-section">
                     <h2 className="similar-properties-title">
                         Other Properties in {property.location.split(",")[0]} (within {radius} miles)
                     </h2>
                     <div className="similar-properties-grid">
-                        {similarByLocation.map((similar) => {
-                            const coords = similar.coordinates?.coordinates;
-                            return (
-                                <div
-                                    key={similar._id}
-                                    className="similar-property-card"
-                                    onClick={() => navigate(`/properties/${similar._id}`)}
-                                >
-                                    <img
-                                        src={`http://localhost:3002${similar.images[0]}`}
-                                        alt={similar.title}
-                                        className="similar-property-image"
-                                        onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
-                                    />
-                                    <div className="similar-property-content">
-                                        <h3>{similar.title}</h3>
-                                        <p>Price: ${similar.price.toLocaleString()}</p>
-                                        <p>Location: {similar.location}</p>
-                                        {coords ? (
-                                            <button
-                                                className="directions-button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openMapLocation(coords);
-                                                }}
-                                                title="View on Map"
-                                            >
-                                                📍 View Map
-                                            </button>
-                                        ) : (
-                                            <p className="no-coordinates">No coordinates available</p>
-                                        )}
-                                    </div>
+                        {similarByLocation.map((similar) => (
+                            <div
+                                key={similar._id}
+                                className="similar-property-card"
+                                onClick={() => navigate(`/properties/${similar._id}`)}
+                            >
+                                <img
+                                    src={`${API}${similar.images[0]}`}
+                                    alt={similar.title}
+                                    className="similar-property-image"
+                                    onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
+                                />
+                                <div className="similar-property-content">
+                                    <h3>{similar.title}</h3>
+                                    <p>Price: ${similar.price.toLocaleString()}</p>
+                                    <p>Location: {similar.location}</p>
+                                    {similar.coordinates?.coordinates ? (
+                                        <button
+                                            className="directions-button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openMapLocation(similar.coordinates!.coordinates);
+                                            }}
+                                            title="View on Map"
+                                        >
+                                            📍 View Map
+                                        </button>
+                                    ) : (
+                                        <p className="no-coordinates">No coordinates available</p>
+                                    )}
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}
 
+            {/* Similar by Price */}
             {similarByPrice.length > 0 && (
                 <div className="similar-properties-section">
                     <h2 className="similar-properties-title">
-                        Properties in Price Range (${(property.price * 0.9).toLocaleString()} - $
-                        {(property.price * 1.1).toLocaleString()}) within {radius} miles
+                        Properties in Price Range (${(property.price * 0.9).toLocaleString()} - ${(property.price * 1.1).toLocaleString()}) within {radius} miles
                     </h2>
                     <div className="similar-properties-grid">
-                        {similarByPrice.map((similar) => {
-                            const coords = similar.coordinates?.coordinates;
-                            return (
-                                <div
-                                    key={similar._id}
-                                    className="similar-property-card"
-                                    onClick={() => navigate(`/properties/${similar._id}`)}
-                                >
-                                    <img
-                                        src={`http://localhost:3002${similar.images[0]}`}
-                                        alt={similar.title}
-                                        className="similar-property-image"
-                                        onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
-                                    />
-                                    <div className="similar-property-content">
-                                        <h3>{similar.title}</h3>
-                                        <p>Price: ${similar.price.toLocaleString()}</p>
-                                        <p>Location: {similar.location}</p>
-                                        {coords ? (
-                                            <button
-                                                className="directions-button"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    openMapLocation(coords);
-                                                }}
-                                                title="View on Map"
-                                            >
-                                                📍 View Map
-                                            </button>
-                                        ) : (
-                                            <p className="no-coordinates">No coordinates available</p>
-                                        )}
-                                    </div>
+                        {similarByPrice.map((similar) => (
+                            <div
+                                key={similar._id}
+                                className="similar-property-card"
+                                onClick={() => navigate(`/properties/${similar._id}`)}
+                            >
+                                <img
+                                    src={`${API}${similar.images[0]}`}
+                                    alt={similar.title}
+                                    className="similar-property-image"
+                                    onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
+                                />
+                                <div className="similar-property-content">
+                                    <h3>{similar.title}</h3>
+                                    <p>Price: ${similar.price.toLocaleString()}</p>
+                                    <p>Location: {similar.location}</p>
+                                    {similar.coordinates?.coordinates ? (
+                                        <button
+                                            className="directions-button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openMapLocation(similar.coordinates!.coordinates);
+                                            }}
+                                            title="View on Map"
+                                        >
+                                            📍 View Map
+                                        </button>
+                                    ) : (
+                                        <p className="no-coordinates">No coordinates available</p>
+                                    )}
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
                 </div>
             )}
+
             <WhatsAppButton message={whatsappMessage} />
         </div>
     );
 };
-
 
 export default PropertyDetails;

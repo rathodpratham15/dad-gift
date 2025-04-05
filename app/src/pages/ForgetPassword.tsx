@@ -7,6 +7,8 @@ import axios from "axios";
 import Lottie from "lottie-react";
 import successAnim from "../assets/success.json";
 
+const API = import.meta.env.VITE_API_URL;
+
 const ForgetPassword: React.FC = () => {
     const [email, setEmail] = useState("");
     const [emailValid, setEmailValid] = useState(true);
@@ -29,7 +31,7 @@ const ForgetPassword: React.FC = () => {
         setLoading(true);
 
         try {
-            await axios.post("http://localhost:3002/api/auth/reset-request", { email });
+            await axios.post(`${API}/api/auth/reset-request`, { email });
             setSubmitted(true);
             toast.success("Reset instructions sent to your email!");
         } catch (error) {

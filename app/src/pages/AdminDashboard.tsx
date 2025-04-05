@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/AdminDashboard.css";
 
+const API = import.meta.env.VITE_API_URL;
+
 const AdminDashboard: React.FC = () => {
     const [analyticsData, setAnalyticsData] = useState({
         propertyViews: 0,
@@ -22,7 +24,6 @@ const AdminDashboard: React.FC = () => {
         facilities: "",
     });
 
-    // ✅ Fix: Declare state for image upload
     const [newImages, setNewImages] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -47,19 +48,13 @@ const AdminDashboard: React.FC = () => {
 
     const fetchAnalytics = async () => {
         try {
-            const response = await axios.get("http://localhost:3002/api/analytics", {
+            const response = await axios.get(`${API}/api/analytics`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
-
             if (response.data && Array.isArray(response.data)) {
                 const totalViews = response.data.reduce((acc, item) => acc + item.totalViews, 0);
                 const userEngagement = users.length;
-
-                setAnalyticsData({
-                    propertyViews: totalViews,
-                    totalSales: 0,
-                    userEngagement,
-                });
+                setAnalyticsData({ propertyViews: totalViews, totalSales: 0, userEngagement });
             }
         } catch (error) {
             console.error("Error fetching analytics:", error);
@@ -68,7 +63,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await axios.get("http://localhost:3002/api/admin/users", {
+            const response = await axios.get(`${API}/api/admin/users`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             setUsers(response.data || []);
@@ -78,11 +73,9 @@ const AdminDashboard: React.FC = () => {
     };
 
     const deleteUser = async (userId: string) => {
-        if (!window.confirm("Are you sure you want to delete this user?")) {
-            return;
-        }
+        if (!window.confirm("Are you sure you want to delete this user?")) return;
         try {
-            await axios.delete(`http://localhost:3002/api/user/${userId}`, {
+            await axios.delete(`${API}/api/user/${userId}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             alert("User deleted successfully!");
@@ -95,7 +88,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchProperties = async () => {
         try {
-            const response = await axios.get("http://localhost:3002/api/properties", {
+            const response = await axios.get(`${API}/api/properties`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             setProperties(response.data.properties || []);
@@ -105,11 +98,9 @@ const AdminDashboard: React.FC = () => {
     };
 
     const deleteProperty = async (propertyId: string) => {
-        if (!window.confirm("Are you sure you want to delete this property?")) {
-            return;
-        }
+        if (!window.confirm("Are you sure you want to delete this property?")) return;
         try {
-            await axios.delete(`http://localhost:3002/api/properties/${propertyId}`, {
+            await axios.delete(`${API}/api/properties/${propertyId}`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             alert("Property deleted successfully!");
@@ -132,7 +123,7 @@ const AdminDashboard: React.FC = () => {
 
     const updateProperty = async () => {
         try {
-            await axios.put(`http://localhost:3002/api/properties/${editingProperty._id}`, updatedDetails, {
+            await axios.put(`${API}/api/properties/${editingProperty._id}`, updatedDetails, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             alert("Property updated successfully!");
@@ -144,25 +135,21 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    // ✅ Fix: Ensure `handleImageChange` is used
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             setNewImages(Array.from(e.target.files));
         }
     };
 
-    // ✅ Fix: Ensure `uploadNewImages` is used and update backend
     const uploadNewImages = async () => {
-        if (newImages.length === 0) {
-            return alert("Please select images to upload.");
-        }
+        if (newImages.length === 0) return alert("Please select images to upload.");
         setIsUploading(true);
 
         const form = new FormData();
         newImages.forEach((image) => form.append("images", image));
 
         try {
-            const response = await axios.post("http://localhost:3002/api/properties/upload", form, {
+            const response = await axios.post(`${API}/api/properties/upload`, form, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -171,7 +158,7 @@ const AdminDashboard: React.FC = () => {
 
             const imageUrls = response.data.filePaths;
 
-            await axios.put(`http://localhost:3002/api/properties/${editingProperty._id}`, {
+            await axios.put(`${API}/api/properties/${editingProperty._id}`, {
                 images: imageUrls,
             }, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -187,9 +174,10 @@ const AdminDashboard: React.FC = () => {
             setIsUploading(false);
         }
     };
+
     const fetchMessages = async () => {
         try {
-            const response = await axios.get("http://localhost:3002/api/messages", {
+            const response = await axios.get(`${API}/api/messages`, {
                 headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
             });
             setMessages(response.data || []);
@@ -208,18 +196,9 @@ const AdminDashboard: React.FC = () => {
             <div className="analytics-section">
                 <h2>Analytics</h2>
                 <div className="analytics-cards">
-                    <div className="analytics-card">
-                        <h3>Property Views</h3>
-                        <p>{analyticsData.propertyViews}</p>
-                    </div>
-                    <div className="analytics-card">
-                        <h3>Total Sales</h3>
-                        <p>{analyticsData.totalSales}</p>
-                    </div>
-                    <div className="analytics-card">
-                        <h3>User Engagement</h3>
-                        <p>{analyticsData.userEngagement}</p>
-                    </div>
+                    <div className="analytics-card"><h3>Property Views</h3><p>{analyticsData.propertyViews}</p></div>
+                    <div className="analytics-card"><h3>Total Sales</h3><p>{analyticsData.totalSales}</p></div>
+                    <div className="analytics-card"><h3>User Engagement</h3><p>{analyticsData.userEngagement}</p></div>
                 </div>
             </div>
 
@@ -234,9 +213,7 @@ const AdminDashboard: React.FC = () => {
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <p>No users available.</p>
-                )}
+                ) : <p>No users available.</p>}
             </div>
 
             <div className="property-management-section">
@@ -251,9 +228,7 @@ const AdminDashboard: React.FC = () => {
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <p>No properties available.</p>
-                )}
+                ) : <p>No properties available.</p>}
             </div>
 
             {editingProperty && (
@@ -271,24 +246,19 @@ const AdminDashboard: React.FC = () => {
                     <button onClick={() => setEditingProperty(null)}>Cancel</button>
                 </div>
             )}
+
             <div className="messaging-section">
                 <h2>Messages</h2>
                 {messages.length > 0 ? (
                     <ul>
                         {messages.map((message) => (
                             <li key={message._id} className="message-item">
-                                <p>
-                                    <strong>{message.name}</strong>: {message.content}
-                                </p>
-                                <button onClick={() => console.log(`Replying to message: ${message._id}`)}>
-                                    Reply
-                                </button>
+                                <p><strong>{message.name}</strong>: {message.content}</p>
+                                <button onClick={() => console.log(`Replying to message: ${message._id}`)}>Reply</button>
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <p>No messages available.</p>
-                )}
+                ) : <p>No messages available.</p>}
             </div>
         </div>
     );

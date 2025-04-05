@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
 import axios from "axios";
-import "../styles/ChatBot.css"; // We'll create this file for styles
+import "../styles/ChatBot.css";
+
+const API = import.meta.env.VITE_API_URL;
 
 const ChatBot = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,25 +16,29 @@ const ChatBot = () => {
         if (!input.trim()) return;
 
         const userMsg = { from: "user", text: input };
-        setMessages([...messages, userMsg]);
+        setMessages((prev) => [...prev, userMsg]);
         setInput("");
 
         try {
-            const res = await axios.post("http://localhost:3002/api/chat", { message: input });
-            setMessages((msgs) => [...msgs, { from: "bot", text: res.data.reply }]);
+            const res = await axios.post(`${API}/api/chat`, { message: input });
+            const reply = res.data?.reply || "Sorry, I didn't understand that.";
+            setMessages((prev) => [...prev, { from: "bot", text: reply }]);
         } catch (err) {
-            setMessages((msgs) => [...msgs, { from: "bot", text: "Sorry, something went wrong." }]);
+            setMessages((prev) => [
+                ...prev,
+                { from: "bot", text: "⚠️ Sorry, something went wrong." },
+            ]);
         }
     };
 
     return (
         <div>
-            {/* Floating Icon */}
+            {/* Floating Toggle Button */}
             <button className="chatbot-toggle" onClick={() => setIsOpen(!isOpen)}>
                 💬
             </button>
 
-            {/* Chat Window */}
+            {/* Chatbot Window */}
             {isOpen && (
                 <div className="chatbot-window">
                     <div className="chatbot-messages">

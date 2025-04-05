@@ -5,6 +5,8 @@ import { facilityIcons } from "../utils/facilityIcons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as Icons from "@fortawesome/free-solid-svg-icons";
 
+const API = import.meta.env.VITE_API_URL;
+
 const AdminPage: React.FC = () => {
     const [formData, setFormData] = useState({
         title: "",
@@ -77,7 +79,7 @@ const AdminPage: React.FC = () => {
         const uploadData = new FormData();
         images.forEach((image) => uploadData.append("images", image));
         try {
-            const response = await axios.post("http://localhost:3002/api/properties/upload", uploadData, {
+            const response = await axios.post(`${API}/api/properties/upload`, uploadData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -120,7 +122,7 @@ const AdminPage: React.FC = () => {
 
         try {
             await axios.post(
-                "http://localhost:3002/api/properties",
+                `${API}/api/properties`,
                 {
                     ...formData,
                     price: parseFloat(formData.price),
