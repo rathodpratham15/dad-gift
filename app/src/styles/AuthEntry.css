@@ -4,9 +4,9 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(to right, #6b89b8, #7f9ad2);
+  background: linear-gradient(to right, #b1bccd, #ffffff);
   padding: 2rem;
-  color: white;
+  color: rgb(0, 0, 0);
   font-family: "Poppins", sans-serif;
   text-align: center;
 }
@@ -18,9 +18,9 @@
 }
 
 .auth-entry-sub {
-  font-size: 1.2rem;
-  margin-bottom: 2.5rem;
-  color: #dceeff;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  color: #000000;
 }
 
 .auth-entry-buttons {
