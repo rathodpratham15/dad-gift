@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(to right, #3b82f6, #2563eb);
+  background: linear-gradient(to right, #6b89b8, #7f9ad2);
   padding: 2rem;
   color: white;
   font-family: "Poppins", sans-serif;
@@ -55,4 +55,15 @@
 
 .auth-button.secondary:hover {
   background-color: #1e40af;
+}
+
+.auth-button.skip {
+  background-color: #e0e0e0;
+  color: #333;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.auth-button.skip:hover {
+  background-color: #d5d5d5;
 }

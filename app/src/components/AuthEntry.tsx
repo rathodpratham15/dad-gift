@@ -12,6 +12,7 @@ const AuthEntry: React.FC = () => {
             <div className="auth-entry-buttons">
                 <button className="auth-button" onClick={() => navigate("/signup")}>Sign Up</button>
                 <button className="auth-button secondary" onClick={() => navigate("/login")}>Login</button>
+                <button className="auth-button skip" onClick={() => navigate("/home")}>Skip Login</button>
             </div>
         </div>
     );
