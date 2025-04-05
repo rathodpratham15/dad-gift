@@ -97,7 +97,7 @@ const Home: React.FC = () => {
         <div className="achievements-grid">
           <div className="achievement-item">
             <img
-              src="https://d1muf25xaso8hp.cloudfront.net/.../calendar.png"
+              src="https://c2d018d8ab71db2688205d1528e82501.cdn.bubble.io/cdn-cgi/image/w=128,h=128,f=auto,dpr=2,fit=contain/f1675908634239x704583542981828100/calendar%20%281%29.png"
               alt="Calendar icon"
               className="achievement-icon"
             />
@@ -106,7 +106,7 @@ const Home: React.FC = () => {
           </div>
           <div className="achievement-item">
             <img
-              src="https://d1muf25xaso8hp.cloudfront.net/.../house.png"
+              src="https://c2d018d8ab71db2688205d1528e82501.cdn.bubble.io/cdn-cgi/image/w=128,h=128,f=auto,dpr=2,fit=contain/f1675908617352x523246597456362700/house.png"
               alt="House icon"
               className="achievement-icon"
             />
@@ -115,7 +115,7 @@ const Home: React.FC = () => {
           </div>
           <div className="achievement-item">
             <img
-              src="https://d1muf25xaso8hp.cloudfront.net/.../dance.png"
+              src="https://c2d018d8ab71db2688205d1528e82501.cdn.bubble.io/cdn-cgi/image/w=128,h=128,f=auto,dpr=2,fit=contain/f1675908321200x309829908910547840/dance.png"
               alt="Happy Renters Icon"
               className="achievement-icon"
             />
