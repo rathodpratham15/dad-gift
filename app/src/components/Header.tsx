@@ -11,7 +11,6 @@ import {
     Shield,
     Moon,
     Sun,
-    Settings,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
