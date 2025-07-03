@@ -31,7 +31,8 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    // Use the isAdmin prop for consistency
+    const userIsAdmin = isAdmin || role === "admin";
 
     const navItems = [
         { href: "/home", icon: Home, text: "Home" },
@@ -75,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
     }, [isDarkMode]);
 
     useEffect(() => {
-        if (isDrawerOpen) {
+        if (menuOpen) {
             document.body.classList.add('drawer-open');
         } else {
             document.body.classList.remove('drawer-open');
@@ -84,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
         return () => {
             document.body.classList.remove('drawer-open');
         };
-    }, [isDrawerOpen]);
+    }, [menuOpen]);
 
     const handleThemeToggle = () => {
         const newTheme = !isDarkMode;
@@ -126,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                             {item.text}
                         </a>
                     ))}
-                    {role === "admin" && token && (
+                    {userIsAdmin && token && (
                         <span className="admin-badge">ADMIN</span>
                     )}
                 </div>
@@ -192,7 +193,7 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                             </li>
                         )}
 
-                        {role === "admin" && token && (
+                        {userIsAdmin && token && (
                             <>
                                 <li className="menu-section-title">Admin</li>
                                 <li
