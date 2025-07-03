@@ -50,7 +50,14 @@ function App() {
           });
           setIsAdmin(response.data.role === "admin");
         } catch (err) {
-          console.error("Error fetching role:", err);
+          // If token is invalid/expired, clear it and don't log error in console
+          if (axios.isAxiosError(err) && err.response?.status === 401) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("role");
+            setIsAdmin(false);
+          } else {
+            console.error("Error fetching role:", err);
+          }
         }
       }
     };

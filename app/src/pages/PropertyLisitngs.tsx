@@ -135,10 +135,10 @@ const PropertyListings: React.FC = () => {
                                         <div className="unique-property-card-content">
                                             <h2 className="unique-property-card-title">{property.title}</h2>
                                             <p className="unique-property-card-price">
-                                                ${property.price.toLocaleString()}
+                                                ₹{property.price.toLocaleString()}
                                             </p>
                                             <p className="unique-property-card-rent">
-                                                Rent: {property.rentPerMonth ? `$${property.rentPerMonth.toLocaleString()}` : "N/A"}
+                                                Rent: {property.rentPerMonth ? `₹${property.rentPerMonth.toLocaleString()}` : "N/A"}
                                             </p>
                                             <p className="unique-property-card-location">{property.location}</p>
                                             <p className="unique-property-card-views">Views: {property.views}</p>

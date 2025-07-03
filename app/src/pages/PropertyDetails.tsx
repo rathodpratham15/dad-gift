@@ -80,17 +80,31 @@ const PropertyDetails: React.FC = () => {
                 setSimilarByPrice(similarResponse.data.similarByPrice || []);
 
                 if (isLoggedIn) {
-                    await axios.post(
-                        `${API}/api/analytics`,
-                        { propertyId: id },
-                        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-                    );
+                    try {
+                        await axios.post(
+                            `${API}/api/analytics`,
+                            { propertyId: id },
+                            { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+                        );
+                    } catch (analyticsError) {
+                        // Analytics is not critical - don't break the page if it fails
+                        if (axios.isAxiosError(analyticsError) && analyticsError.response?.status === 401) {
+                            // Token is invalid, clear it silently
+                            localStorage.removeItem("token");
+                            localStorage.removeItem("role");
+                        }
+                        // Don't throw or log - analytics failure shouldn't affect property loading
+                    }
                 }
-            } catch (error: any) {
-                setError(
-                    error.response?.data?.message ||
-                    "Failed to load property details. It may not exist or the server is unreachable."
-                );
+            } catch (error) {
+                if (axios.isAxiosError(error)) {
+                    setError(
+                        error.response?.data?.message ||
+                        "Failed to load property details. It may not exist or the server is unreachable."
+                    );
+                } else {
+                    setError("Failed to load property details. It may not exist or the server is unreachable.");
+                }
                 setProperty(null);
             } finally {
                 setLoading(false);
@@ -114,9 +128,18 @@ const PropertyDetails: React.FC = () => {
                 { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
             );
             alert("Property added to favorites!");
-        } catch (error: any) {
-            if (axios.isAxiosError(error) && error.response?.status === 409) {
-                alert("Property is already in your favorites.");
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 409) {
+                    alert("Property is already in your favorites.");
+                } else if (error.response?.status === 401) {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("role");
+                    alert("Session expired. Please login again.");
+                    navigate("/login");
+                } else {
+                    alert("Failed to add property to favorites.");
+                }
             } else {
                 alert("Failed to add property to favorites.");
             }
@@ -180,7 +203,7 @@ const PropertyDetails: React.FC = () => {
         ? [property.coordinates.coordinates[1], property.coordinates.coordinates[0]]
         : [0, 0];
 
-    const whatsappMessage = `Hi! I'm interested in this property:\n\n🏡 ${property.title}\n💰 Price: $${property.price.toLocaleString()}\n📍 Location: ${property.location}\n\nFacilities:\n${property.facilities?.map((f) => `• ${f.name}: ${f.value}`).join("\n")}\n\n📷 Photo: ${API}${property.images[0]}`;
+    const whatsappMessage = `Hi! I'm interested in this property:\n\n🏡 ${property.title}\n💰 Price: ₹${property.price.toLocaleString()}\n📍 Location: ${property.location}\n\nFacilities:\n${property.facilities?.map((f) => `• ${f.name}: ${f.value}`).join("\n")}\n\n📷 Photo: ${API}${property.images[0]}`;
 
     return (
         <div className="property-details-container">
@@ -198,9 +221,9 @@ const PropertyDetails: React.FC = () => {
 
                 <div className="property-details-content">
                     <h1 className="property-details-title">{property.title}</h1>
-                    <p className="property-details-price">Price: ${property.price.toLocaleString()}</p>
+                    <p className="property-details-price">Price: ₹{property.price.toLocaleString()}</p>
                     <p className="property-details-type">Type: {property.type}</p>
-                    <p><strong>Rent Per Month:</strong> {property.rentPerMonth ? `$${property.rentPerMonth.toLocaleString()}` : "N/A"}</p>
+                                          <p><strong>Rent Per Month:</strong> {property.rentPerMonth ? `₹${property.rentPerMonth.toLocaleString()}` : "N/A"}</p>
                     <p className="property-details-location">Location: {property.location}</p>
 
                     {(property.facilities?.length ?? 0) > 0 && (
@@ -268,7 +291,7 @@ const PropertyDetails: React.FC = () => {
                                 />
                                 <div className="similar-property-content">
                                     <h3>{similar.title}</h3>
-                                    <p>Price: ${similar.price.toLocaleString()}</p>
+                                    <p>Price: ₹{similar.price.toLocaleString()}</p>
                                     <p>Location: {similar.location}</p>
                                     {similar.coordinates?.coordinates ? (
                                         <button
@@ -295,7 +318,7 @@ const PropertyDetails: React.FC = () => {
             {similarByPrice.length > 0 && (
                 <div className="similar-properties-section">
                     <h2 className="similar-properties-title">
-                        Properties in Price Range (${(property.price * 0.9).toLocaleString()} - ${(property.price * 1.1).toLocaleString()}) within {radius} miles
+                        Properties in Price Range (₹{(property.price * 0.9).toLocaleString()} - ₹{(property.price * 1.1).toLocaleString()}) within {radius} miles
                     </h2>
                     <div className="similar-properties-grid">
                         {similarByPrice.map((similar) => (
@@ -312,7 +335,7 @@ const PropertyDetails: React.FC = () => {
                                 />
                                 <div className="similar-property-content">
                                     <h3>{similar.title}</h3>
-                                    <p>Price: ${similar.price.toLocaleString()}</p>
+                                    <p>Price: ₹{similar.price.toLocaleString()}</p>
                                     <p>Location: {similar.location}</p>
                                     {similar.coordinates?.coordinates ? (
                                         <button

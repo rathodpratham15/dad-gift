@@ -222,7 +222,7 @@ const AdminDashboard: React.FC = () => {
                     <ul>
                         {properties.map((property) => (
                             <li key={property._id} className="property-item">
-                                {property.title} (${property.price.toLocaleString()}) - Rent: ${property.rentPerMonth || "N/A"}
+                                {property.title} (₹{property.price.toLocaleString()}) - Rent: ₹{property.rentPerMonth || "N/A"}
                                 <button onClick={() => editProperty(property)}>Edit</button>
                                 <button onClick={() => deleteProperty(property._id)}>Delete</button>
                             </li>

@@ -147,7 +147,7 @@ const UserDashboard: React.FC = () => {
                                 />
                                 <h3>{property.title}</h3>
                                 <p>{property.location}</p>
-                                <p>${property.price.toLocaleString()}</p>
+                                <p>₹{property.price.toLocaleString()}</p>
                                 <button
                                     onClick={() => handleRemoveFavorite(property._id)}
                                     className="remove-favorite-button"
