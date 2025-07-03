@@ -5,18 +5,18 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 
-import authRoutes from "../service/service/routers/authRoutes.js";
-import adminRoutes from "../service/service/routers/adminRoutes.js";
-import propertyRoutes from "../service/service/routers/propertyRoutes.js";
-import userRoutes from "../service/service/routers/userRoutes.js";
-import analyticsRoutes from "../service/service/routers/analyticsRoutes.js";
-import messagesRoutes from "../service/service/routers/messagesRoutes.js";
-import uploadRoutes from "../service/service/routers/uploadRoutes.js";
-import userViewsRoutes from "../service/service/routers/userViewsRoutes.js";
-import chatRoutes from "../service/service/routers/chat.js";
+import authRoutes from "./service/routers/authRoutes.js";
+import adminRoutes from "./service/routers/adminRoutes.js";
+import propertyRoutes from "./service/routers/propertyRoutes.js";
+import userRoutes from "./service/routers/userRoutes.js";
+import analyticsRoutes from "./service/routers/analyticsRoutes.js";
+import messagesRoutes from "./service/routers/messagesRoutes.js";
+import uploadRoutes from "./service/routers/uploadRoutes.js";
+import userViewsRoutes from "./service/routers/userViewsRoutes.js";
+import chatRoutes from "./service/routers/chat.js";
 import homeConfigRoutes from "./service/routers/homeConfigRoutes.js";
-import resetPasswordRoutes from "./service/routers/resetPasswordRoutes.js"; // ✅ path from root
-import notificationRoutes from "./service/routers/notificationRoutes.js"; // Adjust if needed
+import resetPasswordRoutes from "./service/routers/resetPasswordRoutes.js";
+import notificationRoutes from "./service/routers/notificationRoutes.js";
 
 
 

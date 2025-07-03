@@ -1,21 +1,22 @@
 {
   "version": 2,
-  "name": "dads-gift-frontend",
-  "framework": "vite",
+  "name": "dads-gift-fullstack",
   "buildCommand": "cd app && npm ci && npm run build",
   "outputDirectory": "app/dist",
-  "installCommand": "cd app && npm ci",
-  "routes": [
+  "installCommand": "cd app && npm ci && cd ../api && npm ci",
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "https://dad-gift.onrender.com/api/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/.*",
-      "dest": "/index.html"
+      "source": "/uploads/(.*)",
+      "destination": "/service/uploads/$1"
     }
   ],
   "headers": [
@@ -53,9 +54,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "VITE_API_URL": "@vite_api_url",
-    "VITE_GOOGLE_CLIENT_ID": "@vite_google_client_id"
-  }
+  ]
 } 

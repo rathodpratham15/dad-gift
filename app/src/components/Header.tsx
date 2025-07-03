@@ -11,6 +11,7 @@ import {
     Shield,
     Moon,
     Sun,
+    Settings,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
@@ -112,6 +113,9 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                             {item.text}
                         </a>
                     ))}
+                    {isAdmin && token && (
+                        <span className="admin-badge">ADMIN</span>
+                    )}
                 </div>
 
                 <div className="unique-nav-controls">

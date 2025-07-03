@@ -1,0 +1,49 @@
+# Development files
+node_modules/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build artifacts
+app/dev-dist/
+service/node_modules/
+
+# Documentation
+*.md
+docs/
+README.md
+DEPLOYMENT.md
+FEATURES.md
+
+# Configuration files for other platforms
+render.yaml
+dad-gift.pem
+key-2-gift.pem
+
+# Development tools
+.vscode/
+.idea/
+*.log
+*.lock
+
+# Test files
+test/
+tests/
+**/*.test.*
+**/*.spec.*
+
+# Temporary files
+.tmp/
+temp/
+*.tmp
+*.temp
+
+# Git
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
