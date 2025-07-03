@@ -30,6 +30,8 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
     const drawerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     const navItems = [
         { href: "/home", icon: Home, text: "Home" },
@@ -72,6 +74,18 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
         document.body.classList.toggle("dark", isDarkMode);
     }, [isDarkMode]);
 
+    useEffect(() => {
+        if (isDrawerOpen) {
+            document.body.classList.add('drawer-open');
+        } else {
+            document.body.classList.remove('drawer-open');
+        }
+        
+        return () => {
+            document.body.classList.remove('drawer-open');
+        };
+    }, [isDrawerOpen]);
+
     const handleThemeToggle = () => {
         const newTheme = !isDarkMode;
         setIsDarkMode(newTheme);
@@ -112,7 +126,7 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                             {item.text}
                         </a>
                     ))}
-                    {isAdmin && token && (
+                    {role === "admin" && token && (
                         <span className="admin-badge">ADMIN</span>
                     )}
                 </div>
@@ -121,7 +135,11 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                     <button className="dark-mode-toggle" onClick={handleThemeToggle}>
                         {isDarkMode ? <Sun /> : <Moon />}
                     </button>
-                    <button className="unique-nav-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+                    <button 
+                        className="unique-nav-toggle" 
+                        onClick={() => setMenuOpen(!menuOpen)}
+                        style={{ display: 'flex' }}
+                    >
                         {menuOpen ? <X /> : <Menu />}
                     </button>
                 </div>
@@ -135,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                     <ul className="hamburger-menu-list">
                         {isMobile && (
                             <>
-                                <li className="menu-section-title">Main</li>
+                                <li className="menu-section-title">Navigation</li>
                                 {navItems.map((item) => (
                                     <li
                                         key={item.text}
@@ -148,9 +166,10 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                                 ))}
                             </>
                         )}
-                        <li className="menu-section-title">User</li>
+                        <li className="menu-section-title">Account</li>
 
-                        {token && (
+                        {token ? (
+                            <>
                             <li
                                 onClick={() => handleMenuAction("/user-dashboard")}
                                 className="menu-item"
@@ -158,13 +177,11 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                                 <User className="menu-icon" />
                                 User Dashboard
                             </li>
-                        )}
-
-                        {token ? (
                             <li onClick={handleLogout} className="menu-item">
                                 <LogOut className="menu-icon" />
                                 Logout
                             </li>
+                            </>
                         ) : (
                             <li
                                 onClick={() => handleMenuAction("/login")}
@@ -175,7 +192,7 @@ const Header: React.FC<HeaderProps> = ({ isAdmin, onLogout }) => {
                             </li>
                         )}
 
-                        {isAdmin && token && (
+                        {role === "admin" && token && (
                             <>
                                 <li className="menu-section-title">Admin</li>
                                 <li
