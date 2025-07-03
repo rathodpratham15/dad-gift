@@ -1,32 +1,36 @@
-
-
 .enhanced-contact-container {
-  min-height: 100vh;
-  padding: 4rem 2rem;
-  background: linear-gradient(135deg, var(--background-start), var(--background-end));
-  color: var(--text-primary);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  margin-top: var(--header-height);
+  min-height: calc(100vh - var(--header-height));
+  padding-top: 2rem;
 }
 
 .enhanced-contact-title {
-  font-size: 3rem;
-  font-weight: 800;
-  color: var(--primary-color);
-  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
   text-align: center;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .enhanced-contact-subtitle {
-  font-size: 1.25rem;
+  text-align: center;
+  font-size: 1.2rem;
   color: var(--text-secondary);
   margin-bottom: 3rem;
-  text-align: center;
 }
 
 .enhanced-contact-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 3rem;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -37,10 +41,11 @@
 }
 
 .enhanced-contact-form {
-  background: var(--card-background);
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  padding: 2.5rem;
+  background: var(--glass-bg);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -50,45 +55,52 @@
 .enhanced-contact-textarea {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid var(--input-border);
-  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: rgba(255, 255, 255, 0.9);
   font-size: 1rem;
-  color: var(--text-primary);
-  transition: all 0.3s ease;
+  transition: var(--transition);
+  box-sizing: border-box;
 }
 
 .enhanced-contact-input:focus,
 .enhanced-contact-textarea:focus {
-  border-color: var(--primary-color);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color-alpha);
+}
+
+.enhanced-contact-textarea {
+  min-height: 120px;
+  resize: vertical;
 }
 
 .enhanced-contact-button {
-  background: var(--primary-color);
+  background: var(--primary-gradient);
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem;
   border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
+  border-radius: var(--border-radius);
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition);
 }
 
 .enhanced-contact-button:hover {
-  background: var(--primary-hover);
   transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .enhanced-contact-details {
+  background: var(--glass-bg);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  background: var(--card-background);
-  border-radius: 1rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  padding: 2.5rem;
 }
 
 .enhanced-contact-detail-item h3 {
@@ -98,32 +110,41 @@
 }
 
 .enhanced-contact-detail-item p {
-  font-size: 1rem;
-  color: var(--text-primary);
-  margin: 0;
+  color: var(--text-secondary);
   line-height: 1.6;
+  margin: 0;
 }
 
 .enhanced-contact-map {
   width: 100%;
   height: 300px;
   border: none;
-  border-radius: 0.75rem;
-  margin-top: 1.5rem;
+  border-radius: var(--border-radius);
+  margin-top: 1rem;
 }
 
 @media (max-width: 768px) {
   .enhanced-contact-container {
-    padding: 3rem 1.5rem;
+    padding: 1.5rem 1rem;
   }
 
   .enhanced-contact-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
+  }
+
+  .enhanced-contact-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  .enhanced-contact-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
   .enhanced-contact-form,
   .enhanced-contact-details {
-    padding: 2rem;
+    padding: 1.5rem;
   }
 
   .enhanced-contact-map {

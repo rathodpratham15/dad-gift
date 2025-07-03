@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { User, Home, Eye, MessageSquare, Search, Edit, Trash2, ChevronUp, ChevronDown, MapPin, IndianRupee, Reply, Clock } from "lucide-react";
 import "../styles/AdminDashboard.css";
 
 const API = import.meta.env.VITE_API_URL;
@@ -26,6 +27,10 @@ const AdminDashboard: React.FC = () => {
 
     const [newImages, setNewImages] = useState<File[]>([]);
     const [isUploading, setIsUploading] = useState(false);
+    const [userSearchTerm, setUserSearchTerm] = useState("");
+    const [userSortField, setUserSortField] = useState<'name' | 'email' | 'createdAt'>('name');
+    const [userSortDirection, setUserSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [propertySearchTerm, setPropertySearchTerm] = useState("");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -44,6 +49,7 @@ const AdminDashboard: React.FC = () => {
             }
         };
         fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchAnalytics = async () => {
@@ -117,7 +123,11 @@ const AdminDashboard: React.FC = () => {
             title: property.title,
             price: property.price.toString(),
             rentPerMonth: property.rentPerMonth ? property.rentPerMonth.toString() : "",
-            facilities: property.facilities ? property.facilities.join(", ") : "",
+            facilities: property.facilities ? 
+                (Array.isArray(property.facilities) ? 
+                    property.facilities.map((f: any) => typeof f === 'string' ? f : (f.name || f.value || f.toString())).join(", ") : 
+                    property.facilities.toString()
+                ) : "",
         });
     };
 
@@ -189,46 +199,317 @@ const AdminDashboard: React.FC = () => {
     if (loading) return <p>Loading...</p>;
     if (error) return <p className="error-message">{error}</p>;
 
+    // Get admin info from localStorage
+    const adminEmail = localStorage.getItem("userEmail") || "admin@example.com";
+    const adminRole = localStorage.getItem("role") || "admin";
+
+    // Filter and sort users
+    const filteredUsers = users
+        .filter(user => 
+            user.name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
+            user.email?.toLowerCase().includes(userSearchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            const aValue = a[userSortField] || '';
+            const bValue = b[userSortField] || '';
+            const comparison = aValue.toString().localeCompare(bValue.toString());
+            return userSortDirection === 'asc' ? comparison : -comparison;
+        });
+
+    const handleUserSort = (field: 'name' | 'email' | 'createdAt') => {
+        if (userSortField === field) {
+            setUserSortDirection(userSortDirection === 'asc' ? 'desc' : 'asc');
+        } else {
+            setUserSortField(field);
+            setUserSortDirection('asc');
+        }
+    };
+
+    // Filter properties
+    const filteredProperties = properties.filter(property => 
+        property.title?.toLowerCase().includes(propertySearchTerm.toLowerCase()) ||
+        property.location?.toLowerCase().includes(propertySearchTerm.toLowerCase())
+    );
+
     return (
         <div className="admin-dashboard-container">
-            <h1 className="admin-dashboard-title">Admin Dashboard</h1>
-
-            <div className="analytics-section">
-                <h2>Analytics</h2>
-                <div className="analytics-cards">
-                    <div className="analytics-card"><h3>Property Views</h3><p>{analyticsData.propertyViews}</p></div>
-                    <div className="analytics-card"><h3>Total Sales</h3><p>{analyticsData.totalSales}</p></div>
-                    <div className="analytics-card"><h3>User Engagement</h3><p>{analyticsData.userEngagement}</p></div>
+            {/* Top Greeting Bar */}
+            <div className="admin-greeting-bar">
+                <div className="greeting-content">
+                    <div className="greeting-text">
+                        <h1 className="greeting-title">Welcome back, Admin!</h1>
+                        <p className="greeting-subtitle">
+                            <User className="greeting-icon" />
+                            {adminEmail} • {adminRole.toUpperCase()}
+                        </p>
+                    </div>
+                    <div className="greeting-stats">
+                        <div className="quick-stat">
+                            <span className="stat-number">{users.length}</span>
+                            <span className="stat-label">Users</span>
+                        </div>
+                        <div className="quick-stat">
+                            <span className="stat-number">{properties.length}</span>
+                            <span className="stat-label">Properties</span>
+                        </div>
+                        <div className="quick-stat">
+                            <span className="stat-number">{messages.length}</span>
+                            <span className="stat-label">Messages</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="user-management-section">
-                <h2>User Management</h2>
-                {users.length > 0 ? (
-                    <ul>
-                        {users.map((user) => (
-                            <li key={user._id} className="user-item">
-                                {user.name} ({user.email})
-                                <button onClick={() => deleteUser(user._id)}>Delete</button>
-                            </li>
-                        ))}
-                    </ul>
-                ) : <p>No users available.</p>}
+            {/* Enhanced Analytics Section */}
+            <div className="analytics-section">
+                <h2 className="section-title">Dashboard Overview</h2>
+                <div className="analytics-cards">
+                    <div className="analytics-card">
+                        <div className="card-icon">
+                            <User />
+                        </div>
+                        <div className="card-content">
+                            <h3>Total Users</h3>
+                            <p>{users.length}</p>
+                            <span className="card-trend">+12% this month</span>
+                        </div>
+                    </div>
+                    <div className="analytics-card">
+                        <div className="card-icon">
+                            <Home />
+                        </div>
+                        <div className="card-content">
+                            <h3>Properties</h3>
+                            <p>{properties.length}</p>
+                            <span className="card-trend">+5% this month</span>
+                        </div>
+                    </div>
+                    <div className="analytics-card">
+                        <div className="card-icon">
+                            <Eye />
+                        </div>
+                        <div className="card-content">
+                            <h3>Total Views</h3>
+                            <p>{analyticsData.propertyViews}</p>
+                            <span className="card-trend">+23% this month</span>
+                        </div>
+                    </div>
+                    <div className="analytics-card">
+                        <div className="card-icon">
+                            <MessageSquare />
+                        </div>
+                        <div className="card-content">
+                            <h3>Messages</h3>
+                            <p>{messages.length}</p>
+                            <span className="card-trend">+8% this month</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
+            {/* Enhanced User Management Section */}
+            <div className="user-management-section">
+                <div className="section-header">
+                    <h2 className="section-title">User Management</h2>
+                    <div className="search-container">
+                        <Search className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search users by name or email..."
+                            value={userSearchTerm}
+                            onChange={(e) => setUserSearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
+                </div>
+                
+                {filteredUsers.length > 0 ? (
+                    <div className="table-container">
+                        <table className="users-table">
+                            <thead>
+                                <tr>
+                                    <th 
+                                        className="sortable"
+                                        onClick={() => handleUserSort('name')}
+                                    >
+                                        Name
+                                        {userSortField === 'name' && (
+                                            userSortDirection === 'asc' ? <ChevronUp className="sort-icon" /> : <ChevronDown className="sort-icon" />
+                                        )}
+                                    </th>
+                                    <th 
+                                        className="sortable"
+                                        onClick={() => handleUserSort('email')}
+                                    >
+                                        Email
+                                        {userSortField === 'email' && (
+                                            userSortDirection === 'asc' ? <ChevronUp className="sort-icon" /> : <ChevronDown className="sort-icon" />
+                                        )}
+                                    </th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredUsers.map((user) => (
+                                    <tr key={user._id} className="user-row">
+                                        <td className="user-name">
+                                            <div className="user-avatar">
+                                                <User className="avatar-icon" />
+                                            </div>
+                                            {user.name || 'N/A'}
+                                        </td>
+                                        <td className="user-email">{user.email}</td>
+                                        <td>
+                                            <span className={`role-badge ${user.role || 'user'}`}>
+                                                {(user.role || 'user').toUpperCase()}
+                                            </span>
+                                        </td>
+                                        <td className="user-actions">
+                                            <button 
+                                                className="action-btn edit-btn"
+                                                onClick={() => console.log('Edit user:', user._id)}
+                                                title="Edit User"
+                                            >
+                                                <Edit className="btn-icon" />
+                                            </button>
+                                            <button 
+                                                className="action-btn delete-btn"
+                                                onClick={() => deleteUser(user._id)}
+                                                title="Delete User"
+                                            >
+                                                <Trash2 className="btn-icon" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="empty-state">
+                        <User className="empty-icon" />
+                        <p>No users found</p>
+                        <span className="empty-description">Try adjusting your search criteria</span>
+                    </div>
+                )}
+            </div>
+
+            {/* Enhanced Property Management Section */}
             <div className="property-management-section">
-                <h2>Property Management</h2>
-                {properties.length > 0 ? (
-                    <ul>
-                        {properties.map((property) => (
-                            <li key={property._id} className="property-item">
-                                {property.title} (₹{property.price.toLocaleString()}) - Rent: ₹{property.rentPerMonth || "N/A"}
-                                <button onClick={() => editProperty(property)}>Edit</button>
-                                <button onClick={() => deleteProperty(property._id)}>Delete</button>
-                            </li>
+                <div className="section-header">
+                    <h2 className="section-title">Property Listings</h2>
+                    <div className="search-container">
+                        <Search className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Search properties by title or location..."
+                            value={propertySearchTerm}
+                            onChange={(e) => setPropertySearchTerm(e.target.value)}
+                            className="search-input"
+                        />
+                    </div>
+                </div>
+                
+                {filteredProperties.length > 0 ? (
+                    <div className="properties-grid">
+                        {filteredProperties.map((property) => (
+                            <div key={property._id} className="property-card">
+                                <div className="property-image-container">
+                                    {property.images && property.images.length > 0 ? (
+                                        <img 
+                                            src={property.images[0]} 
+                                            alt={property.title}
+                                            className="property-image"
+                                            onError={(e) => {
+                                                e.currentTarget.src = '/api/placeholder/300/200';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="property-placeholder">
+                                            <Home className="placeholder-icon" />
+                                        </div>
+                                    )}
+                                    <div className="property-badge">
+                                        {property.type || 'Property'}
+                                    </div>
+                                </div>
+                                
+                                <div className="property-content">
+                                    <h3 className="property-title">{property.title}</h3>
+                                    
+                                    <div className="property-location">
+                                        <MapPin className="location-icon" />
+                                        <span>{property.location || 'Location not specified'}</span>
+                                    </div>
+                                    
+                                    <div className="property-prices">
+                                        <div className="price-item">
+                                            <span className="price-label">Sale Price</span>
+                                            <span className="price-value">
+                                                <IndianRupee className="rupee-icon" />
+                                                {property.price?.toLocaleString() || 'N/A'}
+                                            </span>
+                                        </div>
+                                        {property.rentPerMonth && (
+                                            <div className="price-item">
+                                                <span className="price-label">Rent/Month</span>
+                                                <span className="price-value rent">
+                                                    <IndianRupee className="rupee-icon" />
+                                                    {property.rentPerMonth.toLocaleString()}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {property.facilities && property.facilities.length > 0 && (
+                                        <div className="property-facilities">
+                                            {property.facilities.slice(0, 3).map((facility: any, index: number) => {
+                                                // Handle both string and object facilities
+                                                const facilityText = typeof facility === 'string' ? facility : (facility.name || facility.value || facility.toString());
+                                                return (
+                                                    <span key={index} className="facility-tag">
+                                                        {facilityText}
+                                                    </span>
+                                                );
+                                            })}
+                                            {property.facilities.length > 3 && (
+                                                <span className="facility-tag more">
+                                                    +{property.facilities.length - 3} more
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                    
+                                    <div className="property-actions">
+                                        <button 
+                                            className="action-btn edit-btn"
+                                            onClick={() => editProperty(property)}
+                                            title="Edit Property"
+                                        >
+                                            <Edit className="btn-icon" />
+                                            Edit
+                                        </button>
+                                        <button 
+                                            className="action-btn delete-btn"
+                                            onClick={() => deleteProperty(property._id)}
+                                            title="Delete Property"
+                                        >
+                                            <Trash2 className="btn-icon" />
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                    </ul>
-                ) : <p>No properties available.</p>}
+                    </div>
+                ) : (
+                    <div className="empty-state">
+                        <Home className="empty-icon" />
+                        <p>No properties found</p>
+                        <span className="empty-description">Try adjusting your search criteria</span>
+                    </div>
+                )}
             </div>
 
             {editingProperty && (
@@ -247,18 +528,95 @@ const AdminDashboard: React.FC = () => {
                 </div>
             )}
 
+            {/* Enhanced Messages Section */}
             <div className="messaging-section">
-                <h2>Messages</h2>
+                <h2 className="section-title">Recent Messages</h2>
+                
                 {messages.length > 0 ? (
-                    <ul>
-                        {messages.map((message) => (
-                            <li key={message._id} className="message-item">
-                                <p><strong>{message.name}</strong>: {message.content}</p>
-                                <button onClick={() => console.log(`Replying to message: ${message._id}`)}>Reply</button>
-                            </li>
+                    <div className="messages-container">
+                        {messages.slice(0, 6).map((message) => (
+                            <div key={message._id} className="message-card">
+                                <div className="message-header">
+                                    <div className="message-avatar">
+                                        <User className="avatar-icon" />
+                                    </div>
+                                    <div className="message-info">
+                                        <h4 className="message-sender">{message.name || 'Anonymous'}</h4>
+                                        <div className="message-meta">
+                                            <Clock className="time-icon" />
+                                            <span className="message-time">
+                                                {message.createdAt ? 
+                                                    new Date(message.createdAt).toLocaleDateString('en-US', {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        hour: '2-digit',
+                                                        minute: '2-digit'
+                                                    }) : 
+                                                    'Recently'
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="message-status">
+                                        <span className="status-badge unread">New</span>
+                                    </div>
+                                </div>
+                                
+                                <div className="message-content">
+                                    <p className="message-preview">
+                                        {message.content || message.message || 'No message content'}
+                                    </p>
+                                    {message.email && (
+                                        <div className="message-contact">
+                                            <span className="contact-label">Email:</span>
+                                            <span className="contact-value">{message.email}</span>
+                                        </div>
+                                    )}
+                                    {message.phone && (
+                                        <div className="message-contact">
+                                            <span className="contact-label">Phone:</span>
+                                            <span className="contact-value">{message.phone}</span>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <div className="message-actions">
+                                    <button 
+                                        className="message-btn reply-btn"
+                                        onClick={() => console.log(`Replying to message: ${message._id}`)}
+                                        title="Reply to Message"
+                                    >
+                                        <Reply className="btn-icon" />
+                                        Reply
+                                    </button>
+                                    <button 
+                                        className="message-btn mark-read-btn"
+                                        onClick={() => console.log(`Marking as read: ${message._id}`)}
+                                        title="Mark as Read"
+                                    >
+                                        <Eye className="btn-icon" />
+                                        Mark Read
+                                    </button>
+                                </div>
+                            </div>
                         ))}
-                    </ul>
-                ) : <p>No messages available.</p>}
+                        
+                        {messages.length > 6 && (
+                            <div className="view-all-messages">
+                                <button className="view-all-btn">
+                                    <MessageSquare className="btn-icon" />
+                                    View All {messages.length} Messages
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="empty-state">
+                        <MessageSquare className="empty-icon" />
+                        <p>No messages yet</p>
+                        <span className="empty-description">Customer messages will appear here</span>
+                    </div>
+                )}
             </div>
         </div>
     );
