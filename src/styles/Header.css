@@ -6,32 +6,32 @@
   --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   --admin-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
-  --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.15);
-  --shadow-hover: 0 15px 35px rgba(31, 38, 135, 0.2);
+  --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.37);
+  --shadow-hover: 0 15px 35px rgba(31, 38, 135, 0.4);
   --text-primary: #2d3748;
   --text-secondary: #4a5568;
   --text-light: #718096;
   --border-radius: 16px;
   --border-radius-sm: 12px;
   --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  --backdrop-blur: blur(10px);
+  --backdrop-blur: blur(20px);
 }
 
 /* Dark Mode Variables */
 body.dark {
-  --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   --secondary-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
   --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
   --admin-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-bg: rgba(15, 23, 42, 0.4);
   --glass-border: rgba(255, 255, 255, 0.1);
   --text-primary: #f1f5f9;
   --text-secondary: #cbd5e1;
   --text-light: #94a3b8;
-  --shadow-soft: 0 8px 32px rgba(15, 23, 42, 0.3);
-  --shadow-hover: 0 15px 35px rgba(15, 23, 42, 0.4);
+  --shadow-soft: 0 8px 32px rgba(15, 23, 42, 0.5);
+  --shadow-hover: 0 15px 35px rgba(15, 23, 42, 0.6);
 }
 
 /* Main Header */
@@ -40,13 +40,11 @@ body.dark {
   top: 0;
   left: 0;
   right: 0;
-  width: 100%;
   z-index: 1000;
   background: transparent;
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   transition: var(--transition);
-  padding: 0;
-  margin: 0;
+  padding: 0.5rem 0;
 }
 
 .unique-header-scrolled {
@@ -58,38 +56,13 @@ body.dark {
 
 /* Navigation Container */
 .unique-nav-container {
-  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0.5rem 2rem;
+  padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   min-height: 70px;
-  position: relative;
-}
-
-body.dark .unique-header-scrolled {
-  background: rgba(15, 23, 42, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-body.dark .unique-header-scrolled::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    to right,
-    rgba(99, 102, 241, 0.1),
-    rgba(139, 92, 246, 0.1),
-    rgba(236, 72, 153, 0.1)
-  );
-  pointer-events: none;
-  z-index: -1;
 }
 
 /* Logo/Brand */
@@ -644,17 +617,4 @@ body.dark .admin-badge {
   .admin-badge {
     display: none; /* Hide badge on smaller screens to save space */
   }
-}
-
-/* Dark Mode Toggle */
-body.dark .dark-mode-toggle {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #f1f5f9;
-}
-
-body.dark .dark-mode-toggle:hover {
-  background: rgba(15, 23, 42, 0.8);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
 }

@@ -1,0 +1,97 @@
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-family: "Poppins", sans-serif;
+}
+
+.onboarding-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  animation: slideUp 0.3s ease;
+}
+
+.onboarding-image {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1rem;
+}
+
+.onboarding-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.onboarding-description {
+  color: #4b5563;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.onboarding-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.onboarding-skip,
+.onboarding-next {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.onboarding-skip {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.onboarding-skip:hover {
+  background-color: #d1d5db;
+}
+
+.onboarding-next {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.onboarding-next:hover {
+  background-color: #2563eb;
+}
+.onboarding-progress-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

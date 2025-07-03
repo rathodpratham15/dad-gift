@@ -1,40 +1,3 @@
-/* CSS Reset */
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  width: 100%;
-  overflow-x: hidden;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-html::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
-}
-
-body {
-  width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#root {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-}
-
 :root {
   /* Light Mode Colors */
   --bg-light: #f8fafc;
@@ -48,27 +11,23 @@ body {
   
   /* Enhanced Gradients for Dark Mode */
   --primary-gradient-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --primary-gradient-dark: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  --primary-gradient-dark: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   --secondary-gradient-light: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --secondary-gradient-dark: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
   --accent-gradient-light: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   --accent-gradient-dark: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
   
   /* Glass Effects */
-  --glass-bg-light: rgba(255, 255, 255, 0.7);
-  --glass-bg-dark: rgba(15, 23, 42, 0.7);
+  --glass-bg-light: rgba(255, 255, 255, 0.1);
+  --glass-bg-dark: rgba(15, 23, 42, 0.4);
   --glass-border-light: rgba(255, 255, 255, 0.2);
   --glass-border-dark: rgba(255, 255, 255, 0.1);
   
   /* Shadows */
   --shadow-light: 0 4px 6px rgba(0, 0, 0, 0.05);
-  --shadow-dark: 0 8px 32px rgba(15, 23, 42, 0.3);
+  --shadow-dark: 0 8px 32px rgba(15, 23, 42, 0.5);
   --shadow-hover-light: 0 10px 15px rgba(0, 0, 0, 0.1);
-  --shadow-hover-dark: 0 15px 35px rgba(15, 23, 42, 0.4);
-
-  /* Spacing */
-  --header-height: 80px;
-  --section-spacing: 2rem;
+  --shadow-hover-dark: 0 15px 35px rgba(15, 23, 42, 0.6);
 }
 
 body {
@@ -82,22 +41,6 @@ body {
 body.dark {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: var(--text-dark);
-  position: relative;
-}
-
-body.dark::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* Enhanced styling for cards and sections */
@@ -111,8 +54,8 @@ body.dark::before {
 }
 
 body.dark .card, body.dark .section {
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg-dark);
+  border: 1px solid var(--border-dark);
   box-shadow: var(--shadow-dark);
   backdrop-filter: blur(20px);
 }
@@ -123,8 +66,6 @@ body.dark .card, body.dark .section {
 }
 
 body.dark .card:hover, body.dark .section:hover {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: var(--shadow-hover-dark);
 }
 
