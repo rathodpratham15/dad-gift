@@ -1,14 +1,51 @@
-# Development files
-node_modules/
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Testing
+coverage
+
+# Backend
+/service
+/api
+
+# Environment files
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Build artifacts
-app/dev-dist/
-service/node_modules/
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.git
+.gitignore
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Build
+/app/dist
+/app/dev-dist
+/dist
+/dev-dist
+
+# System Files
+.DS_Store
+Thumbs.db
 
 # Documentation
 *.md
@@ -22,9 +59,10 @@ render.yaml
 dad-gift.pem
 key-2-gift.pem
 
+# Build artifacts
+service/node_modules/
+
 # Development tools
-.vscode/
-.idea/
 *.log
 *.lock
 
@@ -39,11 +77,3 @@ tests/
 temp/
 *.tmp
 *.temp
-
-# Git
-.git/
-.gitignore
-
-# OS files
-.DS_Store
-Thumbs.db
