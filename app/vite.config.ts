@@ -20,32 +20,9 @@ export default defineConfig({
       ],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/(?:localhost|.*\.onrender\.com)\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
-              },
-              cacheKeyWillBeUsed: async ({ request }) => {
-                return `${request.url}`;
-              }
-            }
-          }
-        ],
         skipWaiting: true,
         clientsClaim: true,
-        cleanupOutdatedCaches: true,
-        exclude: [
-          // Exclude development files from precaching
-          /^.*\?.*$/,  // Files with query parameters (like HMR)
-          /^\/@.*$/,   // Vite development files
-          /^.*\.map$/,  // Source maps
-          /^.*hot-update.*$/,  // HMR files
-        ]
+        cleanupOutdatedCaches: true
       },
       manifest: {
         name: 'Dad Refined',
