@@ -723,6 +723,33 @@ body.dark .property-images-carousel {
 
 /* Compact design for mobile */
 @media (max-width: 1024px) {
+  .property-main-content {
+    gap: 1.5rem;
+    padding: 0 1rem 2rem;
+  }
+  
+  .property-images-section {
+    height: 350px;
+  }
+  
+  .property-details-section {
+    padding: 1.5rem;
+  }
+  
+  .property-info-grid {
+    gap: 0.75rem;
+  }
+  
+  .facilities-list {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .facility-card {
+    padding: 0.75rem;
+    min-height: 70px;
+  }
+
   .map-section-card,
   .similar-properties-card {
     margin: 1.5rem;
@@ -748,6 +775,49 @@ body.dark .property-images-carousel {
 }
 
 @media (max-width: 768px) {
+  .property-main-content {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 0 1rem 1.5rem;
+  }
+  
+  .property-images-section {
+    height: 300px;
+  }
+  
+  .property-details-section {
+    padding: 1.25rem;
+  }
+  
+  .property-info-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .facilities-list {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .facility-card {
+    padding: 0.75rem;
+    min-height: 65px;
+  }
+  
+  .carousel-control {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .carousel-control.prev {
+    left: 10px;
+  }
+  
+  .carousel-control.next {
+    right: 10px;
+  }
+
   .map-section-card,
   .similar-properties-card {
     margin: 1rem;
@@ -784,9 +854,104 @@ body.dark .property-images-carousel {
   .radius-select select {
     width: 100%;
   }
+
+  /* Hero Section Mobile Responsiveness */
+  .property-hero-section {
+    padding: 1rem;
+    margin: 0 1rem 1.5rem;
+  }
+  
+  .property-hero-title {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+  }
+  
+  .property-hero-price {
+    font-size: clamp(1.25rem, 3.5vw, 1.5rem);
+  }
+  
+  .property-hero-location {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+  }
+
+  .property-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+  
+  .back-to-listings-button,
+  .favorite-button,
+  .directions-button {
+    min-width: auto;
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .property-main-content {
+    padding: 0 0.75rem 1rem;
+    gap: 1rem;
+  }
+  
+  .property-images-section {
+    height: 250px;
+    margin: 0 0.75rem;
+  }
+  
+  .property-details-section {
+    padding: 1rem;
+    margin: 0 0.75rem;
+  }
+  
+  .property-info-grid {
+    gap: 0.5rem;
+  }
+  
+  .property-info-item {
+    padding: 0.75rem;
+  }
+  
+  .facilities-list {
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 0.4rem;
+  }
+  
+  .facility-card {
+    padding: 0.6rem;
+    min-height: 60px;
+  }
+  
+  .facility-icon {
+    width: 16px;
+    height: 16px;
+    margin-bottom: 0.3rem;
+  }
+  
+  .facility-value {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+  
+  .facility-name {
+    font-size: 0.75rem;
+  }
+  
+  .carousel-control {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+  
+  .carousel-control.prev {
+    left: 8px;
+  }
+  
+  .carousel-control.next {
+    right: 8px;
+  }
+
   .map-section-card,
   .similar-properties-card {
     margin: 0.75rem;
@@ -824,6 +989,37 @@ body.dark .property-images-carousel {
   
   .map-container {
     height: 160px;
+  }
+
+  /* Hero Section Mobile Responsiveness */
+  .property-hero-section {
+    padding: 0.75rem;
+    margin: 0 0.75rem 1rem;
+  }
+  
+  .property-hero-title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    line-height: 1.2;
+  }
+  
+  .property-hero-price {
+    font-size: clamp(1.1rem, 4vw, 1.3rem);
+  }
+  
+  .property-hero-location {
+    font-size: clamp(0.85rem, 3vw, 0.95rem);
+  }
+
+  .property-actions {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  .back-to-listings-button,
+  .favorite-button,
+  .directions-button {
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
   }
 }
 

@@ -171,7 +171,7 @@ const AdminPage: React.FC = () => {
                 coordinates, // Now including coordinates
                 area: parseFloat(area),
                 description,
-                images: imageUrls,
+                    images: imageUrls,
                 facilities: facilities.filter(f => f.name.trim()).map(f => ({
                     name: f.name,
                     value: f.count ? `${f.count}` : 'Available',
@@ -312,20 +312,20 @@ const AdminPage: React.FC = () => {
                                 >
                                     <option value="">Select Property Type</option>
                                     <option value="House">House</option>
-                                    <option value="Apartment">Apartment</option>
+                    <option value="Apartment">Apartment</option>
                                     <option value="Condo">Condo</option>
-                                    <option value="Villa">Villa</option>
+                    <option value="Villa">Villa</option>
                                     <option value="Townhouse">Townhouse</option>
                                     <option value="Shop">Shop</option>
                                     <option value="Godown">Godown</option>
                                     <option value="Other">Other</option>
-                                </select>
+                </select>
                             </div>
 
                             {type === 'Other' && (
                                 <div className="input-row">
-                                    <input
-                                        type="text"
+                <input
+                    type="text"
                                         placeholder="Enter custom property type"
                                         value={customType}
                                         onChange={(e) => setCustomType(e.target.value)}
@@ -349,8 +349,8 @@ const AdminPage: React.FC = () => {
                                     placeholder="Rent Per Month (optional)"
                                     value={rentPerMonth}
                                     onChange={(e) => setRentPerMonth(e.target.value)}
-                                    className="enhanced-admin-input"
-                                />
+                    className="enhanced-admin-input"
+                />
                             </div>
 
                             <div className="input-row">
@@ -428,7 +428,7 @@ const AdminPage: React.FC = () => {
 
                         <div className="admin-form-section">
                             <h3 className="section-title">Property Images</h3>
-                            <div className="enhanced-admin-file-upload-section">
+                <div className="enhanced-admin-file-upload-section">
                                 <FaUpload style={{ fontSize: '2rem', color: 'var(--primary-color)', marginBottom: '1rem' }} />
                                 <input
                                     type="file"
@@ -448,27 +448,27 @@ const AdminPage: React.FC = () => {
                                     </p>
                                 )}
                             </div>
-                        </div>
+                </div>
 
                         <div className="admin-form-section">
                             <h3 className="section-title">Facilities & Amenities</h3>
                             
                             {/* Facilities List */}
-                            {facilities.map((facility, index) => (
-                                <div key={index} className="facility-row">
-                                    <input
-                                        type="text"
+                {facilities.map((facility, index) => (
+                    <div key={index} className="facility-row">
+                        <input
+                            type="text"
                                         placeholder="Facility name"
-                                        value={facility.name}
-                                        onChange={(e) => handleFacilityChange(index, "name", e.target.value)}
-                                        className="enhanced-admin-input"
-                                    />
-                                    <select
-                                        value={facility.icon || ""}
-                                        onChange={(e) => handleFacilityChange(index, "icon", e.target.value)}
-                                        className="enhanced-admin-select"
-                                    >
-                                        <option value="">Select Icon</option>
+                            value={facility.name}
+                            onChange={(e) => handleFacilityChange(index, "name", e.target.value)}
+                            className="enhanced-admin-input"
+                        />
+                        <select
+                            value={facility.icon || ""}
+                            onChange={(e) => handleFacilityChange(index, "icon", e.target.value)}
+                            className="enhanced-admin-select"
+                        >
+                            <option value="">Select Icon</option>
                                         <optgroup label="Basic Facilities">
                                             <option value="bedroom">Bedroom</option>
                                             <option value="bathroom">Bathroom</option>
