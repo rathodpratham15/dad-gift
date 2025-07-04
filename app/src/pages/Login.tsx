@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import axios from "axios";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, LogIn, Shield, Users, Star, Home } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
@@ -94,94 +94,136 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
     return (
         <div className="enhanced-login-container">
-            <div className="enhanced-login-card fade-in">
-                <h1 className="enhanced-login-title">Login</h1>
-                <form className="enhanced-login-form" onSubmit={handleSubmit}>
-                    <div className="enhanced-login-input-group">
-                        <label htmlFor="email" className="enhanced-login-label">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            placeholder="Enter your email"
-                            className="enhanced-login-input"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className="enhanced-login-input-group">
-                        <label htmlFor="password" className="enhanced-login-label">Password</label>
-                        <div className="password-input-wrapper">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                id="password"
-                                placeholder="Enter your password"
-                                className="enhanced-login-input"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                            <span
-                                className="toggle-password"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-                            </span>
+            <div className="login-layout">
+                {/* Left Side - Welcome Section */}
+                <div className="login-welcome-section">
+                    <div className="welcome-content">
+                        <h1 className="welcome-title">Welcome Back</h1>
+                        <p className="welcome-subtitle">
+                            Access your real estate dashboard and discover amazing properties that match your dreams.
+                        </p>
+                        
+                        <div className="welcome-features">
+                            <div className="feature-item">
+                                <Home className="feature-icon" />
+                                <span className="feature-text">Thousands of verified properties</span>
+                            </div>
+                            <div className="feature-item">
+                                <Shield className="feature-icon" />
+                                <span className="feature-text">Secure and trusted platform</span>
+                            </div>
+                            <div className="feature-item">
+                                <Users className="feature-icon" />
+                                <span className="feature-text">Expert real estate agents</span>
+                            </div>
+                            <div className="feature-item">
+                                <Star className="feature-icon" />
+                                <span className="feature-text">5-star customer service</span>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="remember-me">
-                        <input
-                            type="checkbox"
-                            checked={rememberMe}
-                            onChange={() => setRememberMe(!rememberMe)}
-                            id="remember"
-                        />
-                        <label htmlFor="remember">Remember me</label>
-                        <button
-                            className="forgot-password-link"
-                            type="button"
-                            onClick={() => navigate("/forgot-password")}
-                        >
-                            Forgot password?
-                        </button>
+                {/* Right Side - Form Section */}
+                <div className="login-form-section">
+                    <div className="enhanced-login-card fade-in">
+                        <h1 className="enhanced-login-title">Login</h1>
+                        <p className="login-subtitle">
+                            Enter your credentials to access your account
+                        </p>
+                        
+                        <form className="enhanced-login-form" onSubmit={handleSubmit}>
+                            <div className="enhanced-login-input-group">
+                                <label htmlFor="email" className="enhanced-login-label">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    placeholder="Enter your email"
+                                    className="enhanced-login-input"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div className="enhanced-login-input-group">
+                                <label htmlFor="password" className="enhanced-login-label">Password</label>
+                                <div className="password-input-wrapper">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        placeholder="Enter your password"
+                                        className="enhanced-login-input"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                    <span
+                                        className="toggle-password"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="remember-me">
+                                <div className="remember-me-left">
+                                    <input
+                                        type="checkbox"
+                                        checked={rememberMe}
+                                        onChange={() => setRememberMe(!rememberMe)}
+                                        id="remember"
+                                    />
+                                    <label htmlFor="remember">Remember me</label>
+                                </div>
+                                <button
+                                    className="forgot-password-link"
+                                    type="button"
+                                    onClick={() => navigate("/forgot-password")}
+                                >
+                                    Forgot password?
+                                </button>
+                            </div>
+
+                            {error && <p className="enhanced-login-error">{error}</p>}
+
+                            <button type="submit" className="enhanced-login-button" disabled={loading}>
+                                {loading ? (
+                                    "Signing in..."
+                                ) : (
+                                    <>
+                                        <LogIn size={18} />
+                                        Login
+                                    </>
+                                )}
+                            </button>
+
+                            <div className="or-divider">OR</div>
+
+                            <div className="google-oauth-wrapper">
+                                <GoogleLogin
+                                    onSuccess={handleGoogleLogin}
+                                    onError={() => {
+                                        toast.error("Google Sign-In failed");
+                                        setError("Google Sign-In failed");
+                                    }}
+                                />
+                            </div>
+                        </form>
+
+                        <div className="enhanced-login-footer">
+                            <p>
+                                Don't have an account?
+                                <button
+                                    className="enhanced-signup-link"
+                                    onClick={() => navigate("/signup")}
+                                >
+                                    Sign up
+                                </button>
+                            </p>
+                        </div>
                     </div>
-
-                    {error && <p className="enhanced-login-error">{error}</p>}
-
-                    <button type="submit" className="enhanced-login-button" disabled={loading}>
-                        {loading ? "Logging in..." : (
-                            <>
-                                <LogIn size={18} style={{ marginRight: "8px" }} />
-                                Login
-                            </>
-                        )}
-                    </button>
-
-                    <div className="or-divider">OR</div>
-
-                    <div className="google-oauth-wrapper">
-                        <GoogleLogin
-                            onSuccess={handleGoogleLogin}
-                            onError={() => {
-                                toast.error("Google Sign-In failed");
-                                setError("Google Sign-In failed");
-                            }}
-                        />
-                    </div>
-                </form>
-
-                <div className="enhanced-login-footer">
-                    <p>
-                        Don’t have an account?{" "}
-                        <button
-                            className="enhanced-signup-link"
-                            onClick={() => navigate("/signup")}
-                        >
-                            Sign-up
-                        </button>
-                    </p>
                 </div>
             </div>
         </div>

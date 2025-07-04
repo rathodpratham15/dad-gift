@@ -32,7 +32,7 @@ interface MapComponentProps extends Omit<MapContainerProps, 'center'> {
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ center, properties }) => (
-    <MapContainer center={center} zoom={12} style={{ height: "400px", width: "100%" }}>
+    <MapContainer center={center} zoom={12} style={{ height: "100%", width: "100%" }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {properties.map((prop) =>
             prop.coordinates?.coordinates && (
@@ -207,106 +207,173 @@ const PropertyDetails: React.FC = () => {
 
     return (
         <div className="property-details-container">
-            <div className="property-details-card">
-                <div className="property-images-carousel">
-                    <button onClick={handlePreviousImage} className="carousel-control prev">◀</button>
-                    <img
-                        src={`${API}${property.images[currentImageIndex]}`}
-                        alt={`Property image ${currentImageIndex + 1}`}
-                        className="property-details-image"
-                        onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/400x400?text=Image+Not+Found")}
-                    />
-                    <button onClick={handleNextImage} className="carousel-control next">▶</button>
+            {/* Hero Section with Property Title */}
+            <div className="property-hero-section">
+                <h1 className="property-hero-title">{property.title}</h1>
+                <p className="property-hero-price">₹{property.price.toLocaleString()}</p>
+                <div className="property-hero-location">
+                    <span>📍</span>
+                    {property.location}
+                </div>
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="property-main-content">
+                {/* Image Section */}
+                <div className="property-images-section">
+                    <div className="property-images-carousel">
+                        <button onClick={handlePreviousImage} className="carousel-control prev">◀</button>
+                        <img
+                            src={`${API}${property.images[currentImageIndex]}`}
+                            alt={`Property image ${currentImageIndex + 1}`}
+                            className="property-details-image"
+                            onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/400x400?text=Image+Not+Found")}
+                        />
+                        <button onClick={handleNextImage} className="carousel-control next">▶</button>
+                    </div>
                 </div>
 
-                <div className="property-details-content">
-                    <h1 className="property-details-title">{property.title}</h1>
-                    <p className="property-details-price">Price: ₹{property.price.toLocaleString()}</p>
-                    <p className="property-details-type">Type: {property.type}</p>
-                                          <p><strong>Rent Per Month:</strong> {property.rentPerMonth ? `₹${property.rentPerMonth.toLocaleString()}` : "N/A"}</p>
-                    <p className="property-details-location">Location: {property.location}</p>
+                {/* Property Details Section */}
+                <div className="property-details-section">
+                    {/* Property Info Grid */}
+                    <div className="property-info-grid">
+                        <div className="property-info-item">
+                            <div className="property-info-label">Type</div>
+                            <div className="property-info-value">{property.type}</div>
+                        </div>
+                        <div className="property-info-item">
+                            <div className="property-info-label">Rent Per Month</div>
+                            <div className="property-info-value">
+                                {property.rentPerMonth ? `₹${property.rentPerMonth.toLocaleString()}` : "N/A"}
+                            </div>
+                        </div>
+                        <div className="property-info-item">
+                            <div className="property-info-label">Views</div>
+                            <div className="property-info-value">{property.views}</div>
+                        </div>
+                        <div className="property-info-item">
+                            <div className="property-info-label">Property ID</div>
+                            <div className="property-info-value">#{property._id.slice(-6).toUpperCase()}</div>
+                        </div>
+                    </div>
 
+                    {/* Facilities Section */}
                     {(property.facilities?.length ?? 0) > 0 && (
-                        <>
-                            <h3 className="mt-6 text-xl font-semibold text-center">Facilities</h3>
+                        <div className="facilities-section">
+                            <h3 className="facilities-title">Facilities & Amenities</h3>
                             <Facilities facilities={property.facilities || []} />
-                        </>
+                        </div>
                     )}
 
-                    <p className="property-details-description">Description: {property.description}</p>
+                    {/* Description */}
+                    {property.description && (
+                        <div className="property-description">
+                            <strong>Description:</strong> {property.description}
+                        </div>
+                    )}
 
-                    <div className="property-details-buttons">
-                        <button onClick={() => navigate("/properties")} className="back-to-listings-button">Back</button>
-                        <button onClick={handleAddToFavorites} className="favorite-button">Mark as Favorite</button>
+                    {/* Action Buttons */}
+                    <div className="property-actions">
+                        <button onClick={() => navigate("/properties")} className="back-to-listings-button">
+                            ← Back
+                        </button>
+                        <button onClick={handleAddToFavorites} className="favorite-button">
+                            ♥ Favorite
+                        </button>
                         {property.coordinates?.coordinates && (
-                            <button onClick={getDirections} className="directions-button">Get Directions</button>
+                            <button onClick={getDirections} className="directions-button">
+                                🧭 Directions
+                            </button>
                         )}
                     </div>
                 </div>
             </div>
 
-            <div className="map-section">
-                <h2 className="map-title">Property Location</h2>
-                {property.coordinates?.coordinates ? (
-                    <MapComponent
-                        center={mapCenter}
-                        properties={[
-                            ...new Map(
-                                [property, ...similarByLocation, ...similarByPrice].map((p) => [p._id, p])
-                            ).values(),
-                        ]}
-                    />
+            {/* Map Section as Card */}
+            <div className="map-section-card">
+                <h2 className="map-section-title">
+                    Property Location
+                </h2>
+                {property.coordinates ? (
+                    <>
+                        <div className="map-container">
+                            <MapComponent
+                                center={mapCenter}
+                                properties={[
+                                    ...new Map(
+                                        [property, ...similarByLocation, ...similarByPrice].map((p) => [p._id, p])
+                                    ).values(),
+                                ]}
+                            />
+                        </div>
+                        <div className="radius-select">
+                            <label htmlFor="radius">Show properties within:</label>
+                            <select
+                                id="radius"
+                                value={radius}
+                                onChange={(e) => setRadius(parseInt(e.target.value))}
+                            >
+                                <option value={1}>1 km</option>
+                                <option value={2}>2 km</option>
+                                <option value={5}>5 km</option>
+                                <option value={10}>10 km</option>
+                            </select>
+                        </div>
+                    </>
                 ) : (
-                    <div className="error-message">Map unavailable: Missing coordinates.</div>
+                    <div className="no-coordinates-card">
+                        Location information is not available for this property
+                    </div>
                 )}
-
-                <div className="radius-select">
-                    <label>Radius (miles): </label>
-                    <select value={radius} onChange={(e) => setRadius(parseInt(e.target.value))}>
-                        <option value={5}>5</option>
-                        <option value={10}>10</option>
-                        <option value={15}>15</option>
-                    </select>
-                </div>
             </div>
 
-            {/* Similar by Location */}
+            {/* Similar Properties Section as Card */}
             {similarByLocation.length > 0 && (
-                <div className="similar-properties-section">
+                <div className="similar-properties-card">
                     <h2 className="similar-properties-title">
-                        Other Properties in {property.location.split(",")[0]} (within {radius} miles)
+                        Properties Nearby
                     </h2>
                     <div className="similar-properties-grid">
-                        {similarByLocation.map((similar) => (
+                        {similarByLocation.map((similarProperty) => (
                             <div
-                                key={similar._id}
-                                className="similar-property-card"
-                                onClick={() => navigate(`/properties/${similar._id}`)}
+                                key={similarProperty._id}
+                                className="similar-property-item"
+                                onClick={() => navigate(`/properties/${similarProperty._id}`)}
                             >
                                 <img
-                                    src={`${API}${similar.images[0]}`}
-                                    alt={similar.title}
+                                    src={`${API}${similarProperty.images[0]}`}
+                                    alt={similarProperty.title}
                                     className="similar-property-image"
                                     onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
                                 />
                                 <div className="similar-property-content">
-                                    <h3>{similar.title}</h3>
-                                    <p>Price: ₹{similar.price.toLocaleString()}</p>
-                                    <p>Location: {similar.location}</p>
-                                    {similar.coordinates?.coordinates ? (
+                                    <h3>{similarProperty.title}</h3>
+                                    <div className="similar-property-info">
+                                        <p><strong>Price:</strong> ₹{similarProperty.price.toLocaleString()}</p>
+                                        <p><strong>Location:</strong> {similarProperty.location}</p>
+                                    </div>
+                                    <div className="similar-property-actions">
                                         <button
-                                            className="directions-button"
+                                            className="view-property-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                openMapLocation(similar.coordinates!.coordinates);
+                                                navigate(`/properties/${similarProperty._id}`);
                                             }}
-                                            title="View on Map"
                                         >
-                                            📍 View Map
+                                            View Details
                                         </button>
-                                    ) : (
-                                        <p className="no-coordinates">No coordinates available</p>
-                                    )}
+                                        {similarProperty.coordinates?.coordinates && (
+                                            <button
+                                                className="view-map-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openMapLocation(similarProperty.coordinates!.coordinates);
+                                                }}
+                                            >
+                                                📍 Map
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -314,43 +381,53 @@ const PropertyDetails: React.FC = () => {
                 </div>
             )}
 
-            {/* Similar by Price */}
+            {/* Similar by Price Section as Card */}
             {similarByPrice.length > 0 && (
-                <div className="similar-properties-section">
+                <div className="similar-properties-card">
                     <h2 className="similar-properties-title">
-                        Properties in Price Range (₹{(property.price * 0.9).toLocaleString()} - ₹{(property.price * 1.1).toLocaleString()}) within {radius} miles
+                        Similar Price Range (₹{(property.price * 0.9).toLocaleString()} - ₹{(property.price * 1.1).toLocaleString()})
                     </h2>
                     <div className="similar-properties-grid">
-                        {similarByPrice.map((similar) => (
+                        {similarByPrice.map((similarProperty) => (
                             <div
-                                key={similar._id}
-                                className="similar-property-card"
-                                onClick={() => navigate(`/properties/${similar._id}`)}
+                                key={similarProperty._id}
+                                className="similar-property-item"
+                                onClick={() => navigate(`/properties/${similarProperty._id}`)}
                             >
                                 <img
-                                    src={`${API}${similar.images[0]}`}
-                                    alt={similar.title}
+                                    src={`${API}${similarProperty.images[0]}`}
+                                    alt={similarProperty.title}
                                     className="similar-property-image"
                                     onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/250x180?text=Image+Not+Found")}
                                 />
                                 <div className="similar-property-content">
-                                    <h3>{similar.title}</h3>
-                                    <p>Price: ₹{similar.price.toLocaleString()}</p>
-                                    <p>Location: {similar.location}</p>
-                                    {similar.coordinates?.coordinates ? (
+                                    <h3>{similarProperty.title}</h3>
+                                    <div className="similar-property-info">
+                                        <p><strong>Price:</strong> ₹{similarProperty.price.toLocaleString()}</p>
+                                        <p><strong>Location:</strong> {similarProperty.location}</p>
+                                    </div>
+                                    <div className="similar-property-actions">
                                         <button
-                                            className="directions-button"
+                                            className="view-property-btn"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                openMapLocation(similar.coordinates!.coordinates);
+                                                navigate(`/properties/${similarProperty._id}`);
                                             }}
-                                            title="View on Map"
                                         >
-                                            📍 View Map
+                                            View Details
                                         </button>
-                                    ) : (
-                                        <p className="no-coordinates">No coordinates available</p>
-                                    )}
+                                        {similarProperty.coordinates?.coordinates && (
+                                            <button
+                                                className="view-map-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openMapLocation(similarProperty.coordinates!.coordinates);
+                                                }}
+                                            >
+                                                📍 Map
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}
