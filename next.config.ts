@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
       { protocol: 'http', hostname: 'localhost' },
     ],
   },
-  serverActions: {
-    bodySizeLimit: '10mb',
-  },
 }
 
 export default nextConfig
