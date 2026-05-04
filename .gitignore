@@ -25,6 +25,12 @@ tmp/
 .tmp/
 .cache/
 
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
 # Environment variables and secrets
 .env
 .env.local
