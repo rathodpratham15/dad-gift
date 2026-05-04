@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int        @id @default(autoincrement())
+  email              String     @unique
+  password           String
+  firstName          String     @map("first_name")
+  lastName           String     @map("last_name")
+  role               String     @default("user")
+  isActive           Boolean    @default(true) @map("is_active")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  updatedAt          DateTime   @updatedAt @map("updated_at")
+  properties         Property[]
+  contacts           Contact[]
+  favoriteProperties Property[] @relation("UserFavorites")
+
+  @@map("users")
+}
+
+model Agent {
+  id                Int        @id @default(autoincrement())
+  firstName         String     @map("first_name")
+  lastName          String     @map("last_name")
+  email             String
+  phone             String?
+  bio               String?
+  photo             String?
+  licenseNumber     String?    @map("license_number")
+  yearsOfExperience Int?       @map("years_of_experience")
+  specialties       Json?
+  socialLinks       Json?      @map("social_links")
+  isActive          Boolean    @default(true) @map("is_active")
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  properties        Property[]
+  blogPosts         BlogPost[]
+  contacts          Contact[]
+
+  @@map("agents")
+}
+
+model Property {
+  id                Int           @id @default(autoincrement())
+  userId            Int?          @map("user_id")
+  agentId           Int?          @map("agent_id")
+  title             String
+  slug              String        @unique
+  description       String?
+  address           String
+  city              String
+  state             String
+  zipCode           String        @map("zip_code")
+  country           String
+  latitude          Float?
+  longitude         Float?
+  price             Float
+  propertyType      String        @map("property_type")
+  propertyTypeOther String?       @map("property_type_other")
+  bedrooms          Int?
+  bathrooms         Float?
+  squareFeet        Int?          @map("square_feet")
+  yearBuilt         Int?          @map("year_built")
+  status            String        @default("for_sale")
+  featured          Boolean       @default(false)
+  rating            Float?
+  isPopular         Boolean       @default(false) @map("is_popular")
+  mainImage         String?       @map("main_image")
+  images            Json?
+  videos            Json?
+  features          Json?
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  user              User?         @relation(fields: [userId], references: [id])
+  agent             Agent?        @relation(fields: [agentId], references: [id])
+  testimonials      Testimonial[]
+  favoritedBy       User[]        @relation("UserFavorites")
+
+  @@map("properties")
+}
+
+model BlogPost {
+  id            Int       @id @default(autoincrement())
+  title         String
+  slug          String    @unique
+  excerpt       String?
+  content       String
+  featuredImage String?   @map("featured_image")
+  category      String?
+  authorId      Int?      @map("author_id")
+  tags          Json?
+  published     Boolean   @default(false)
+  publishedAt   DateTime? @map("published_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  author        Agent?    @relation(fields: [authorId], references: [id])
+
+  @@map("blog_posts")
+}
+
+model Testimonial {
+  id           Int       @id @default(autoincrement())
+  clientName   String    @map("client_name")
+  clientPhoto  String?   @map("client_photo")
+  content      String
+  rating       Float?
+  propertyType String?   @map("property_type")
+  propertyId   Int?      @map("property_id")
+  featured     Boolean   @default(false)
+  order        Int       @default(0)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  property     Property? @relation(fields: [propertyId], references: [id])
+
+  @@map("testimonials")
+}
+
+model Contact {
+  id            Int       @id @default(autoincrement())
+  userId        Int?      @map("user_id")
+  name          String
+  email         String
+  phone         String?
+  subject       String?
+  message       String
+  adminResponse String?   @map("admin_response")
+  agentId       Int?      @map("agent_id")
+  status        String    @default("new")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  user          User?     @relation(fields: [userId], references: [id])
+  agent         Agent?    @relation(fields: [agentId], references: [id])
+
+  @@map("contacts")
+}
