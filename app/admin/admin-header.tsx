@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { adminLogoutAction } from '@/app/actions/auth'
-import { Home, MessageSquare, Star, Plus, LogOut } from 'lucide-react'
+import { Home, MessageSquare, Star, LogOut, ExternalLink } from 'lucide-react'
 
 interface AdminHeaderProps {
   newInquiriesCount?: number
@@ -19,21 +19,46 @@ export default function AdminHeader({ newInquiriesCount = 0 }: AdminHeaderProps)
   ]
 
   return (
-    <header className="bg-black text-white px-6 py-4 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/admin/properties" className="text-xl font-bold text-white">
-          Realest Admin
-        </Link>
+    <header className="bg-black text-white sticky top-0 z-50">
+      {/* Top row: logo + actions */}
+      <div className="px-4 md:px-6 py-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Link href="/admin/properties" className="text-lg font-bold text-white whitespace-nowrap">
+            Realest Admin
+          </Link>
+          <Link
+            href="/"
+            className="flex items-center gap-1 text-xs text-gray-400 hover:text-white transition-colors border border-white/20 rounded-full px-2.5 py-1 whitespace-nowrap"
+          >
+            <ExternalLink className="h-3 w-3" />
+            View Site
+          </Link>
+        </div>
 
-        <nav className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
+          <form action={adminLogoutAction}>
+            <button
+              type="submit"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Nav row — scrollable on mobile */}
+      <div className="border-t border-white/10 px-4 md:px-6 overflow-x-auto">
+        <nav className="flex items-center gap-1 py-1 min-w-max">
           {navItems.map(({ href, label, icon: Icon, badge }) => (
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors relative ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors relative whitespace-nowrap ${
                 pathname.startsWith(href)
                   ? 'bg-white text-black'
-                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
               }`}
             >
               <Icon className="h-4 w-4" />
@@ -46,25 +71,6 @@ export default function AdminHeader({ newInquiriesCount = 0 }: AdminHeaderProps)
             </Link>
           ))}
         </nav>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/properties/create"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-white text-black hover:bg-gray-100 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Add Property
-          </Link>
-          <form action={adminLogoutAction}>
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </button>
-          </form>
-        </div>
       </div>
     </header>
   )

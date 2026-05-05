@@ -17,6 +17,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: post.title,
     description: post.excerpt || undefined,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || undefined,
+      type: 'article',
+      images: post.featuredImage ? [{ url: post.featuredImage, alt: post.title }] : [],
+      url: `https://realestate.pratham.click/blog/${slug}`,
+    },
+    alternates: { canonical: `https://realestate.pratham.click/blog/${slug}` },
   }
 }
 

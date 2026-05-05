@@ -202,41 +202,45 @@ export default function ListingsClient({ properties, filters, cities, googleMaps
         <div className="max-w-7xl mx-auto">
           <motion.div className="text-center mb-12" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <span className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4 bg-white text-black">All Listings</span>
-            <h1 className="text-5xl md:text-6xl font-bold text-black mb-4">Explore Our Properties</h1>
-            <p className="text-lg text-gray-700 max-w-2xl mx-auto">Discover your dream home from our curated collection of luxury properties</p>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-black mb-4">Explore Our Properties</h1>
+            <p className="text-base md:text-lg text-gray-700 max-w-2xl mx-auto">Discover your dream home from our curated collection of luxury properties</p>
           </motion.div>
 
           <div className="max-w-7xl mx-auto">
-            <div className="p-4 md:p-5 bg-white/80 backdrop-blur-sm border border-white/60 rounded-2xl shadow-sm mb-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="p-4 bg-white/80 backdrop-blur-sm border border-white/60 rounded-2xl shadow-sm mb-4">
+              {/* Search row */}
+              <div className="flex items-center gap-2 mb-3">
+                <div className="relative flex-1">
+                  <Search className="h-4 w-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input type="text" value={searchInput} onChange={(e) => { setSearchInput(e.target.value); handleFilterChange('search', e.target.value || null) }} placeholder="Search by title, city, or address" className="w-full pl-9 pr-4 py-2.5 bg-white rounded-full border border-gray-200 text-sm text-black" />
+                </div>
+                <button onClick={applyFilters} className="px-4 py-2.5 bg-black text-white rounded-full text-sm hover:bg-black/90 transition-colors whitespace-nowrap">Search</button>
+              </div>
+
+              {/* Second row: Near me + count */}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="relative">
-                    <Search className="h-4 w-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input type="text" value={searchInput} onChange={(e) => { setSearchInput(e.target.value); handleFilterChange('search', e.target.value || null) }} placeholder="Search by title, city, or address" className="w-72 max-w-full pl-9 pr-4 py-2 bg-white rounded-full border border-gray-200 text-sm text-black" />
-                  </div>
-                  <button onClick={applyFilters} className="px-4 py-2 bg-black text-white rounded-full text-sm hover:bg-black/90 transition-colors">Search</button>
-                  <button onClick={useMyLocation} disabled={isLocating} className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-black inline-flex items-center gap-2 hover:bg-gray-50 disabled:opacity-60">
+                  <button onClick={useMyLocation} disabled={isLocating} className="px-3 py-2 bg-white border border-gray-200 rounded-full text-sm text-black inline-flex items-center gap-1.5 hover:bg-gray-50 disabled:opacity-60">
                     <Navigation className="h-4 w-4" />{isLocating ? 'Locating...' : 'Near Me'}
                   </button>
                   {localFilters.latitude && localFilters.longitude && (
-                    <button onClick={clearLocation} className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-800 hover:bg-gray-200">Clear Location</button>
+                    <button onClick={clearLocation} className="px-3 py-2 bg-gray-100 rounded-full text-sm text-gray-800 hover:bg-gray-200">Clear Location</button>
                   )}
                 </div>
-                <p className="text-sm text-gray-700">Showing <span className="font-semibold text-black">{properties.meta.total}</span> properties</p>
+                <p className="text-sm text-gray-700"><span className="font-semibold text-black">{properties.meta.total}</span> properties</p>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all duration-300">
-                  <Filter className="h-4 w-4" /><span>{showFilters ? 'Hide Filters' : 'Filters'}</span>
+              {/* Third row: Filters + Sort */}
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-200 text-sm hover:shadow-md transition-all">
+                  <Filter className="h-4 w-4" />{showFilters ? 'Hide Filters' : 'Filters'}
                 </button>
                 <div className="flex flex-wrap items-center gap-2">
-                  <label className="text-sm text-gray-700">Radius</label>
                   <select value={localFilters.radiusKm || 25} onChange={(e) => { const v = Number(e.target.value); handleFilterChange('radiusKm', v); if (localFilters.latitude && localFilters.longitude) router.push(buildUrl({ ...localFilters, radiusKm: v }, 1)) }} className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm text-black">
                     <option value={10}>10 km</option><option value={25}>25 km</option><option value={50}>50 km</option><option value={100}>100 km</option>
                   </select>
-                  <label className="text-sm text-gray-700">Sort by</label>
                   <select value={localFilters.sort || 'popular'} onChange={(e) => { const sort = e.target.value; handleFilterChange('sort', sort); router.push(buildUrl({ ...localFilters, sort }, 1)) }} className="px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm text-black">
-                    <option value="popular">Popular First</option><option value="distance">Nearest to Me</option><option value="latest">Latest</option><option value="price_low">Price: Low to High</option><option value="price_high">Price: High to Low</option><option value="rating_high">Highest Rated</option>
+                    <option value="popular">Popular</option><option value="distance">Nearest</option><option value="latest">Latest</option><option value="price_low">Price ↑</option><option value="price_high">Price ↓</option><option value="rating_high">Top Rated</option>
                   </select>
                 </div>
               </div>
@@ -310,7 +314,7 @@ export default function ListingsClient({ properties, filters, cities, googleMaps
                         {property.isPopular && <div className="absolute top-4 left-4 bg-rose-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">Popular</div>}
                       </div>
                       <div className="p-6">
-                        <h3 className="text-2xl font-bold text-black mb-2 capitalize group-hover:text-gray-700 transition-colors">{property.title}</h3>
+                        <h3 className="text-lg font-bold text-black mb-2 capitalize group-hover:text-gray-700 transition-colors">{property.title}</h3>
                         {property.overallRating && <p className="text-sm font-medium text-amber-600 mb-2 inline-flex items-center gap-1"><Star className="h-4 w-4 fill-current" />{property.overallRating.toFixed(1)} / 5{property.ratingCount ? ` (${property.ratingCount})` : ''}</p>}
                         <div className="flex items-center gap-2 text-gray-600 mb-2"><MapPin className="h-4 w-4" /><span className="text-sm">{property.address || 'Premium Location'}</span></div>
                         {typeof property.distanceKm === 'number' && <p className="text-xs text-sky-700 mb-4">{property.distanceKm.toFixed(1)} km from your location</p>}

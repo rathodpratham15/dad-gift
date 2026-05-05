@@ -124,10 +124,10 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
   }
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-white overflow-hidden">
+    <section ref={sectionRef} className="py-16 md:py-24 px-4 md:px-6 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto mb-12">
         <div
-          className={`text-center transition-all duration-1000 ${
+          className={`flex flex-col items-center text-center w-full transition-all duration-1000 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
         >
@@ -137,8 +137,8 @@ export default function Testimonials({ testimonials }: TestimonialsProps) {
           >
             Testimonials
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-black">
-            In our clients' words, real estate done right
+          <h2 className="text-3xl md:text-5xl font-bold text-black">
+            In our clients&apos; words, real estate done right
           </h2>
           <p className="text-lg text-gray-600 mt-4">
             What our clients say about the quality, service, and results we deliver.

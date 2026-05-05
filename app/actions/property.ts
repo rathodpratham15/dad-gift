@@ -53,38 +53,42 @@ export async function createPropertyAction(formData: FormData) {
   try { videosJson = videosRaw ? JSON.parse(videosRaw) : [] } catch {}
   try { featuresJson = featuresRaw ? JSON.parse(featuresRaw) : null } catch {}
 
-  const property = await prisma.property.create({
-    data: {
-      title,
-      slug,
-      description: (formData.get('description') as string) || null,
-      address: (formData.get('address') as string)?.trim(),
-      city: (formData.get('city') as string)?.trim(),
-      state: (formData.get('state') as string)?.trim(),
-      zipCode: (formData.get('zipCode') as string)?.trim(),
-      country: (formData.get('country') as string)?.trim() || 'India',
-      latitude: parseF('latitude'),
-      longitude: parseF('longitude'),
-      price: parseF('price') || 0,
-      propertyType: (formData.get('propertyType') as string) || 'house',
-      propertyTypeOther: (formData.get('propertyTypeOther') as string) || null,
-      bedrooms: parseI('bedrooms'),
-      bathrooms: parseF('bathrooms'),
-      squareFeet: parseI('squareFeet'),
-      yearBuilt: parseI('yearBuilt'),
-      status: (formData.get('status') as string) || 'for_sale',
-      featured: parseBool('featured'),
-      rating: parseF('rating'),
-      isPopular: parseBool('isPopular'),
-      mainImage: (formData.get('mainImage') as string) || null,
-      images: imagesJson,
-      videos: videosJson,
-      features: featuresJson as object ?? undefined,
-      userId: parseInt(session.user.id),
-    },
-  })
+  try {
+    await prisma.property.create({
+      data: {
+        title,
+        slug,
+        description: (formData.get('description') as string) || null,
+        address: (formData.get('address') as string)?.trim(),
+        city: (formData.get('city') as string)?.trim(),
+        state: (formData.get('state') as string)?.trim(),
+        zipCode: (formData.get('zipCode') as string)?.trim(),
+        country: (formData.get('country') as string)?.trim() || 'India',
+        latitude: parseF('latitude'),
+        longitude: parseF('longitude'),
+        price: parseF('price') || 0,
+        propertyType: (formData.get('propertyType') as string) || 'house',
+        propertyTypeOther: (formData.get('propertyTypeOther') as string) || null,
+        bedrooms: parseI('bedrooms'),
+        bathrooms: parseF('bathrooms'),
+        squareFeet: parseI('squareFeet'),
+        yearBuilt: parseI('yearBuilt'),
+        status: (formData.get('status') as string) || 'for_sale',
+        featured: parseBool('featured'),
+        rating: parseF('rating'),
+        isPopular: parseBool('isPopular'),
+        mainImage: (formData.get('mainImage') as string) || null,
+        images: imagesJson,
+        videos: videosJson,
+        features: featuresJson as object ?? undefined,
+        userId: parseInt(session.user.id),
+      },
+    })
+  } catch {
+    return { error: 'Failed to create property. Please try again.' }
+  }
 
-  redirect(`/admin/properties/${property.id}/edit`)
+  redirect('/admin/properties?success=Property+created+successfully')
 }
 
 export async function updatePropertyAction(id: number, formData: FormData) {
@@ -125,36 +129,40 @@ export async function updatePropertyAction(id: number, formData: FormData) {
   try { if (videosRaw) videosJson = JSON.parse(videosRaw) } catch {}
   try { if (featuresRaw) featuresJson = JSON.parse(featuresRaw) } catch {}
 
-  await prisma.property.update({
-    where: { id },
-    data: {
-      title: title || property.title,
-      slug,
-      description: (formData.get('description') as string) || null,
-      address: (formData.get('address') as string)?.trim() || property.address,
-      city: (formData.get('city') as string)?.trim() || property.city,
-      state: (formData.get('state') as string)?.trim() || property.state,
-      zipCode: (formData.get('zipCode') as string)?.trim() || property.zipCode,
-      country: (formData.get('country') as string)?.trim() || property.country,
-      latitude: parseF('latitude', property.latitude),
-      longitude: parseF('longitude', property.longitude),
-      price: parseF('price', property.price) || property.price,
-      propertyType: (formData.get('propertyType') as string) || property.propertyType,
-      propertyTypeOther: (formData.get('propertyTypeOther') as string) || null,
-      bedrooms: parseI('bedrooms', property.bedrooms),
-      bathrooms: parseF('bathrooms', property.bathrooms),
-      squareFeet: parseI('squareFeet', property.squareFeet),
-      yearBuilt: parseI('yearBuilt', property.yearBuilt),
-      status: (formData.get('status') as string) || property.status,
-      featured: parseBool('featured', property.featured),
-      rating: parseF('rating', property.rating),
-      isPopular: parseBool('isPopular', property.isPopular),
-      mainImage: (formData.get('mainImage') as string) || property.mainImage,
-      images: imagesJson,
-      videos: videosJson,
-      features: featuresJson as object ?? undefined,
-    },
-  })
+  try {
+    await prisma.property.update({
+      where: { id },
+      data: {
+        title: title || property.title,
+        slug,
+        description: (formData.get('description') as string) || null,
+        address: (formData.get('address') as string)?.trim() || property.address,
+        city: (formData.get('city') as string)?.trim() || property.city,
+        state: (formData.get('state') as string)?.trim() || property.state,
+        zipCode: (formData.get('zipCode') as string)?.trim() || property.zipCode,
+        country: (formData.get('country') as string)?.trim() || property.country,
+        latitude: parseF('latitude', property.latitude),
+        longitude: parseF('longitude', property.longitude),
+        price: parseF('price', property.price) || property.price,
+        propertyType: (formData.get('propertyType') as string) || property.propertyType,
+        propertyTypeOther: (formData.get('propertyTypeOther') as string) || null,
+        bedrooms: parseI('bedrooms', property.bedrooms),
+        bathrooms: parseF('bathrooms', property.bathrooms),
+        squareFeet: parseI('squareFeet', property.squareFeet),
+        yearBuilt: parseI('yearBuilt', property.yearBuilt),
+        status: (formData.get('status') as string) || property.status,
+        featured: parseBool('featured', property.featured),
+        rating: parseF('rating', property.rating),
+        isPopular: parseBool('isPopular', property.isPopular),
+        mainImage: (formData.get('mainImage') as string) || property.mainImage,
+        images: imagesJson,
+        videos: videosJson,
+        features: featuresJson as object ?? undefined,
+      },
+    })
+  } catch {
+    return { error: 'Failed to update property. Please try again.' }
+  }
 
   return { success: 'Property updated successfully!' }
 }

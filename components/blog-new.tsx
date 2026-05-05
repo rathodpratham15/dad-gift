@@ -15,7 +15,7 @@ export default function Blog({ posts }: BlogProps) {
   const otherPosts = posts.slice(1)
 
   return (
-    <section className="py-24 px-6 bg-gray-50">
+    <section className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-12">
           <div>
@@ -25,8 +25,8 @@ export default function Blog({ posts }: BlogProps) {
             >
               Blog
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-black">
-              Explore our latest blogs for<br />real estate insights
+            <h2 className="text-3xl md:text-5xl font-bold text-black">
+              Explore our latest blogs for real estate insights
             </h2>
           </div>
           <Link href="/blog">

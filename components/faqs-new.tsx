@@ -40,7 +40,7 @@ export default function FAQs({ faqs }: FAQsProps) {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-gray-50">
+    <section ref={sectionRef} className="py-16 md:py-24 px-4 md:px-6 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <div
           className={`text-center mb-12 transition-all duration-1000 ${
@@ -53,7 +53,7 @@ export default function FAQs({ faqs }: FAQsProps) {
           >
             FAQs
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-black mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold text-black mb-4">
             Your questions answered
           </h2>
           <p className="text-lg text-gray-600 mb-6">

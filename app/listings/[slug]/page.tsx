@@ -14,7 +14,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params
   const property = await prisma.property.findUnique({ where: { slug } })
   if (!property) return { title: 'Property Not Found' }
-  return { title: property.title }
+  const description = property.description
+    ? property.description.slice(0, 155)
+    : `${property.propertyType} in ${property.city}, ${property.state}. Listed at ${property.price.toLocaleString('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })}.`
+  return {
+    title: property.title,
+    description,
+    openGraph: {
+      title: property.title,
+      description,
+      images: property.mainImage ? [{ url: property.mainImage, alt: property.title }] : [],
+      url: `https://realestate.pratham.click/listings/${slug}`,
+    },
+    alternates: { canonical: `https://realestate.pratham.click/listings/${slug}` },
+  }
 }
 
 export default async function PropertyDetailPage({ params }: PageProps) {
@@ -72,8 +85,35 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210'
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'RealEstateListing',
+    name: rawProperty.title,
+    description: rawProperty.description ?? undefined,
+    url: `https://realestate.pratham.click/listings/${rawProperty.slug}`,
+    image: rawProperty.mainImage ?? undefined,
+    offers: {
+      '@type': 'Offer',
+      price: rawProperty.price,
+      priceCurrency: 'INR',
+      availability: 'https://schema.org/InStock',
+    },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: rawProperty.address,
+      addressLocality: rawProperty.city,
+      addressRegion: rawProperty.state,
+      postalCode: rawProperty.zipCode,
+      addressCountry: rawProperty.country,
+    },
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar user={user} />
       <PropertyDetailClient
         property={property as any}
