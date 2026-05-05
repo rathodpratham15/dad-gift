@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { User, LogOut, LogIn, Menu, X } from 'lucide-react'
 import { logoutAction } from '@/app/actions/auth'
 
 interface NavbarProps {
   user?: { firstName: string; role: string } | null
+  lightBg?: boolean
 }
 
 const navLinks = [
@@ -17,7 +19,7 @@ const navLinks = [
   { href: '/contact', label: 'Contact' },
 ]
 
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar({ user, lightBg }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
@@ -43,8 +45,15 @@ export default function Navbar({ user }: NavbarProps) {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-black">
-            Realest
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src={lightBg || scrolled || mobileOpen ? '/logo-blue.png' : '/logo-white.png'}
+              alt="Realest logo"
+              width={36}
+              height={36}
+              className="h-9 w-9 object-contain"
+            />
+            <span className="text-2xl font-bold text-black">Realest</span>
           </Link>
 
           {/* Desktop nav */}

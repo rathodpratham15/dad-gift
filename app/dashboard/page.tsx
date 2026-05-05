@@ -61,7 +61,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar user={userInfo} />
+      <Navbar user={userInfo} lightBg />
       <DashboardClient
         user={user}
         favorites={favorites as any}

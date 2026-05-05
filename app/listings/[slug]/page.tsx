@@ -114,7 +114,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Navbar user={user} />
+      <Navbar user={user} lightBg />
       <PropertyDetailClient
         property={property as any}
         similarProperties={similarProperties as any}

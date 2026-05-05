@@ -73,7 +73,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar user={user} />
+      <Navbar user={user} lightBg />
       <BlogPageClient
         posts={posts as any}
         categories={categories}

@@ -49,7 +49,7 @@ export default async function AboutPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar user={user} />
+      <Navbar user={user} lightBg />
       <AboutClient agents={agents as any} stats={stats} />
       <Footer />
     </div>

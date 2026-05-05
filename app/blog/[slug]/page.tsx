@@ -85,7 +85,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar user={user} />
+      <Navbar user={user} lightBg />
       <BlogPostClient post={post as any} relatedPosts={relatedPosts as any} />
       <Footer />
     </div>
