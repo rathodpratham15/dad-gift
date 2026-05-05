@@ -86,6 +86,7 @@ dev-dist/
 
 # Backend specific
 uploads/
+public/uploads/
 
 # Docker
 .dockerignore

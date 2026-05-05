@@ -5,7 +5,7 @@ import { auth } from '@/lib/auth'
 import AdminHeader from '../admin-header'
 import { formatPrice } from '@/lib/utils'
 import DeletePropertyButton from './delete-button'
-import { Eye, Pencil, Star, Plus } from 'lucide-react'
+import { Eye, Pencil, Star, Plus, CheckCircle } from 'lucide-react'
 
 interface PageProps {
   searchParams: Promise<Record<string, string>>
@@ -38,6 +38,13 @@ export default async function AdminPropertiesPage({ searchParams }: PageProps) {
       <AdminHeader newInquiriesCount={newInquiriesCount} />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {params.success && (
+          <div className="flex items-center gap-3 mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl text-green-800 text-sm">
+            <CheckCircle className="h-5 w-5 flex-shrink-0 text-green-600" />
+            {decodeURIComponent(params.success)}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-black">Properties</h1>
