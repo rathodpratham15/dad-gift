@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
 }

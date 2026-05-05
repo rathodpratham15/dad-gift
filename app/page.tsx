@@ -7,10 +7,14 @@ import Listings from '@/components/listings-new'
 import Testimonials from '@/components/testimonials-new'
 import Process from '@/components/process-new'
 import FAQs from '@/components/faqs-new'
+import Blog from '@/components/blog-new'
 import Footer from '@/components/footer-new'
 
 export const metadata: Metadata = {
-  title: 'Discover the perfect place to call home',
+  title: 'Discover the Perfect Place to Call Home',
+  description:
+    'Browse luxury homes, commercial properties, and rental listings. Work with experienced agents to find your dream property.',
+  alternates: { canonical: 'https://realestate.pratham.click' },
 }
 
 const processSteps = [
@@ -74,6 +78,19 @@ export default async function HomePage() {
         <Listings properties={featuredProperties as any} />
         <Testimonials testimonials={serializedTestimonials as any} />
         <Process steps={processSteps} />
+        {recentBlogPosts.length > 0 && (
+          <Blog
+            posts={recentBlogPosts.map((p) => ({
+              ...p,
+              publishedAt: p.publishedAt?.toISOString() ?? null,
+              createdAt: p.createdAt.toISOString(),
+              updatedAt: p.updatedAt.toISOString(),
+              author: p.author
+                ? { ...p.author, createdAt: p.author.createdAt.toISOString(), updatedAt: p.author.updatedAt.toISOString() }
+                : undefined,
+            })) as any}
+          />
+        )}
         <FAQs faqs={faqsData} />
       </main>
       <Footer />

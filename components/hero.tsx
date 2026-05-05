@@ -1,9 +1,16 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from './ui/button'
+
+const stats = [
+  { value: '200+', label: 'Properties Listed' },
+  { value: '150+', label: 'Happy Clients' },
+  { value: '10+', label: 'Years Experience' },
+  { value: '98%', label: 'Satisfaction Rate' },
+]
 
 export default function Hero() {
   const [isVisible, setIsVisible] = useState(false)
@@ -33,16 +40,37 @@ export default function Hero() {
         >
           Your trusted real estate agency for luxury homes, offering exquisite properties.
         </p>
-        <Link href="/listings">
-          <Button
-            className={`bg-white text-black hover:bg-white/90 px-8 py-6 text-base rounded-full shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 delay-400 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            Work with us
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </Link>
+        <div
+          className={`flex flex-col sm:flex-row gap-4 justify-center transition-all duration-1000 delay-300 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          <Link href="/listings">
+            <Button className="bg-white text-black hover:bg-white/90 px-8 py-6 text-base rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              Browse Listings
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/contact">
+            <Button className="bg-transparent text-white border-2 border-white/60 hover:bg-white/10 px-8 py-6 text-base rounded-full transition-all duration-300 hover:scale-105">
+              Work with us
+            </Button>
+          </Link>
+        </div>
+
+        {/* Stats bar */}
+        <div
+          className={`mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 transition-all duration-1000 delay-500 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
+        >
+          {stats.map((stat) => (
+            <div key={stat.label} className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-4">
+              <p className="text-3xl font-bold text-white">{stat.value}</p>
+              <p className="text-sm text-white/80 mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div
@@ -55,7 +83,7 @@ export default function Hero() {
           <div className="absolute bottom-0 w-[84%] max-w-4xl h-20 rounded-full bg-black/20 blur-2xl pointer-events-none" />
           <img
             src="https://framerusercontent.com/images/0xRyovYW1MyJtHWWrMvJemqp6E.png?width=2666&height=1325"
-            alt="Modern architecture"
+            alt="Modern luxury home"
             className="relative z-10 w-auto max-w-4xl h-auto object-contain drop-shadow-[0_28px_60px_rgba(17,35,46,0.32)]"
             style={{ maxHeight: '60vh' }}
           />
