@@ -279,19 +279,6 @@ export default function ListingsClient({ properties, filters, cities, googleMaps
         </div>
       </div>
 
-      {googleMapsApiKey && (
-        <section className="px-6 pb-10 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
-                <h2 className="text-xl font-semibold text-black">Map View</h2>
-                <p className="text-sm text-gray-600">Location-aware discovery using Google Maps API</p>
-              </div>
-              <div ref={mapContainerRef} className="w-full h-[340px] bg-gray-100" />
-            </div>
-          </div>
-        </section>
-      )}
 
       <section className="py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -346,8 +333,9 @@ export default function ListingsClient({ properties, filters, cities, googleMaps
         </div>
       </section>
 
-      <button onClick={() => setIsCopilotOpen(true)} className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-black text-white shadow-xl hover:bg-black/90 flex items-center justify-center" aria-label="Open Property Copilot">
-        <MessageCircle className="h-6 w-6" />
+      <button onClick={() => setIsCopilotOpen(true)} className="fixed bottom-6 right-6 z-40 h-12 px-5 rounded-full bg-black text-white shadow-xl hover:bg-black/90 flex items-center gap-2 text-sm font-medium" aria-label="Open Property Copilot">
+        <MessageCircle className="h-5 w-5" />
+        Ask me
       </button>
 
       {isCopilotOpen && (

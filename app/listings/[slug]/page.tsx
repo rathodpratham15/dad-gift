@@ -30,6 +30,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
 export default async function PropertyDetailPage({ params }: PageProps) {
   const { slug } = await params
 
@@ -49,14 +59,25 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  const similarPropertiesRaw = await prisma.property.findMany({
-    where: {
-      propertyType: rawProperty.propertyType,
-      id: { not: rawProperty.id },
-      status: 'for_sale',
-    },
-    take: 4,
-  })
+  const [similarPropertiesRaw, candidatesForNearby] = await Promise.all([
+    prisma.property.findMany({
+      where: {
+        propertyType: rawProperty.propertyType,
+        id: { not: rawProperty.id },
+        status: 'for_sale',
+      },
+      take: 4,
+    }),
+    rawProperty.latitude && rawProperty.longitude
+      ? prisma.property.findMany({
+          where: {
+            id: { not: rawProperty.id },
+            latitude: { not: null },
+            longitude: { not: null },
+          },
+        })
+      : Promise.resolve([]),
+  ])
 
   // Serialize dates
   const property = {
@@ -82,6 +103,30 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   }))
+
+  const nearbyProperties = rawProperty.latitude && rawProperty.longitude
+    ? candidatesForNearby
+        .map((p) => ({
+          ...p,
+          distance: haversineKm(
+            rawProperty.latitude!,
+            rawProperty.longitude!,
+            p.latitude as number,
+            p.longitude as number,
+          ),
+        }))
+        .filter((p) => p.distance < 15)
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 4)
+        .map(({ distance: _d, ...p }) => ({
+          ...p,
+          images: (p.images as string[]) || [],
+          videos: (p.videos as string[]) || [],
+          features: p.features as Record<string, unknown> | null,
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+        }))
+    : []
 
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+919876543210'
 
@@ -118,6 +163,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       <PropertyDetailClient
         property={property as any}
         similarProperties={similarProperties as any}
+        nearbyProperties={nearbyProperties as any}
         propertyTestimonials={propertyTestimonials as any}
         whatsappNumber={whatsappNumber}
         user={user}
