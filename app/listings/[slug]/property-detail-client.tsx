@@ -232,10 +232,11 @@ export default function PropertyDetailClient({
                 <h2 className="text-2xl font-bold mb-4">Location</h2>
                 <div className="rounded-2xl overflow-hidden border border-gray-200 aspect-[16/9]">
                   <iframe
-                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${property.longitude - 0.015},${property.latitude - 0.01},${property.longitude + 0.015},${property.latitude + 0.01}&layer=mapnik&marker=${property.latitude},${property.longitude}`}
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${property.latitude},${property.longitude}&zoom=15`}
                     className="w-full h-full"
                     title="Property location"
                     loading="lazy"
+                    allowFullScreen
                   />
                 </div>
                 <div className="mt-3 flex gap-3">
