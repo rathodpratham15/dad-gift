@@ -121,6 +121,16 @@ model Testimonial {
   @@map("testimonials")
 }
 
+model PasswordResetToken {
+  id        Int      @id @default(autoincrement())
+  email     String
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("password_reset_tokens")
+}
+
 model Contact {
   id            Int       @id @default(autoincrement())
   userId        Int?      @map("user_id")
