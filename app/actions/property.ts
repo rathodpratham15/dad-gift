@@ -164,7 +164,7 @@ export async function updatePropertyAction(id: number, formData: FormData) {
     return { error: 'Failed to update property. Please try again.' }
   }
 
-  return { success: 'Property updated successfully!' }
+  redirect('/admin/properties?success=Property+updated+successfully')
 }
 
 export async function deletePropertyAction(id: number) {

@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import type { Property } from '@/lib/types'
-import { Upload, X, Plus } from 'lucide-react'
+import { Upload, X, Plus, MapPin, Loader2 } from 'lucide-react'
 
 interface PropertyFormProps {
   property?: Partial<Property>
@@ -17,11 +17,15 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
   const [result, setResult] = useState<{ error?: string; success?: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [geocoding, setGeocoding] = useState(false)
   const [mainImage, setMainImage] = useState(property?.mainImage || '')
   const [images, setImages] = useState<string[]>(property?.images || [])
   const [propertyType, setPropertyType] = useState<string>(property?.propertyType || 'house')
+  const [lat, setLat] = useState<string>(property?.latitude?.toString() ?? '')
+  const [lng, setLng] = useState<string>(property?.longitude?.toString() ?? '')
   const mainImageInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const handleUpload = async (file: File, isMain: boolean) => {
     setUploading(true)
@@ -44,6 +48,45 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
     }
   }
 
+  const handleGeocode = async () => {
+    const form = formRef.current
+    if (!form) return
+    const address = (form.elements.namedItem('address') as HTMLInputElement)?.value?.trim()
+    const city = (form.elements.namedItem('city') as HTMLInputElement)?.value?.trim()
+    const state = (form.elements.namedItem('state') as HTMLInputElement)?.value?.trim()
+    const zip = (form.elements.namedItem('zipCode') as HTMLInputElement)?.value?.trim()
+    const country = (form.elements.namedItem('country') as HTMLInputElement)?.value?.trim()
+    const fullAddress = [address, city, state, zip, country].filter(Boolean).join(', ')
+    if (!fullAddress) {
+      setResult({ error: 'Fill in at least one address field before auto-detecting coordinates.' })
+      return
+    }
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!key) {
+      setResult({ error: 'Google Maps API key not configured (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY).' })
+      return
+    }
+    setGeocoding(true)
+    setResult(null)
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(fullAddress)}&key=${key}`
+      )
+      const data = await res.json()
+      if (data.status === 'OK' && data.results[0]) {
+        const { lat: gLat, lng: gLng } = data.results[0].geometry.location
+        setLat(gLat.toString())
+        setLng(gLng.toString())
+      } else {
+        setResult({ error: 'Could not find coordinates for this address. Please enter them manually.' })
+      }
+    } catch {
+      setResult({ error: 'Geocoding failed. Please try again.' })
+    } finally {
+      setGeocoding(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setSubmitting(true)
@@ -61,7 +104,7 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
   const labelCls = 'block text-sm font-medium text-gray-700 mb-1'
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-8">
       {result?.error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm">
           {result.error}
@@ -236,26 +279,58 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
               className={inputCls}
             />
           </div>
-          <div>
-            <label className={labelCls}>Latitude</label>
-            <input
-              type="number"
-              name="latitude"
-              step="any"
-              defaultValue={property?.latitude ?? ''}
-              className={inputCls}
-            />
+        </div>
+
+        {/* Coordinates */}
+        <div className="mt-5">
+          <div className="flex items-center justify-between mb-3">
+            <label className={`${labelCls} mb-0`}>Coordinates</label>
+            <button
+              type="button"
+              onClick={handleGeocode}
+              disabled={geocoding}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium hover:bg-gray-100 transition-colors disabled:opacity-60"
+            >
+              {geocoding ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <MapPin className="h-4 w-4" />
+              )}
+              {geocoding ? 'Detecting…' : 'Auto-detect from address'}
+            </button>
           </div>
-          <div>
-            <label className={labelCls}>Longitude</label>
-            <input
-              type="number"
-              name="longitude"
-              step="any"
-              defaultValue={property?.longitude ?? ''}
-              className={inputCls}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Latitude</label>
+              <input
+                type="number"
+                name="latitude"
+                step="any"
+                value={lat}
+                onChange={(e) => setLat(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. 28.6139"
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Longitude</label>
+              <input
+                type="number"
+                name="longitude"
+                step="any"
+                value={lng}
+                onChange={(e) => setLng(e.target.value)}
+                className={inputCls}
+                placeholder="e.g. 77.2090"
+              />
+            </div>
           </div>
+          {lat && lng && (
+            <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" />
+              Pinned at {parseFloat(lat).toFixed(5)}, {parseFloat(lng).toFixed(5)}
+            </p>
+          )}
         </div>
       </div>
 
