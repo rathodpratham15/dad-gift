@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { Property, Testimonial } from '@/lib/types'
-import { Bed, Bath, Maximize, MapPin, ArrowLeft, Calendar, Heart, Star, MessageCircle } from 'lucide-react'
+import { Bed, Bath, Maximize, MapPin, ArrowLeft, Calendar, Heart, Star, MessageCircle, Navigation, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { createWhatsAppLink } from '@/lib/whatsapp'
@@ -14,6 +14,7 @@ import { submitContactAction } from '@/app/actions/contact'
 interface PropertyDetailClientProps {
   property: Property
   similarProperties?: Property[]
+  nearbyProperties?: Property[]
   propertyTestimonials?: Testimonial[]
   whatsappNumber?: string
   user?: { firstName: string; role: string } | null
@@ -22,6 +23,7 @@ interface PropertyDetailClientProps {
 export default function PropertyDetailClient({
   property,
   similarProperties = [],
+  nearbyProperties = [],
   propertyTestimonials = [],
   whatsappNumber = '+919876543210',
   user,
@@ -224,6 +226,41 @@ export default function PropertyDetailClient({
               </div>
             )}
 
+            {/* Map */}
+            {property.latitude && property.longitude && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4">Location</h2>
+                <div className="rounded-2xl overflow-hidden border border-gray-200 aspect-[16/9]">
+                  <iframe
+                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${property.longitude - 0.015},${property.latitude - 0.01},${property.longitude + 0.015},${property.latitude + 0.01}&layer=mapnik&marker=${property.latitude},${property.longitude}`}
+                    className="w-full h-full"
+                    title="Property location"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="mt-3 flex gap-3">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${property.latitude},${property.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-black text-white text-sm font-medium hover:bg-gray-900 transition-colors"
+                  >
+                    <Navigation className="h-4 w-4" />
+                    Get Directions
+                  </a>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${property.latitude},${property.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    View on Google Maps
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* Testimonials */}
             {propertyTestimonials.length > 0 && (
               <div className="mb-8">
@@ -331,6 +368,36 @@ export default function PropertyDetailClient({
           </div>
         </div>
       </section>
+
+      {/* Nearby properties */}
+      {nearbyProperties.length > 0 && (
+        <section className="py-12 px-6 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-3xl font-bold mb-2">Nearby Properties</h2>
+            <p className="text-gray-500 text-sm mb-8">Other properties within 15 km</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {nearbyProperties.map((p) => (
+                <Link
+                  key={p.id}
+                  href={`/listings/${p.slug}`}
+                  className="bg-gray-50 rounded-2xl overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  {p.mainImage ? (
+                    <img src={p.mainImage} alt={p.title} className="w-full h-40 object-cover" />
+                  ) : (
+                    <div className="w-full h-40 bg-gray-200" />
+                  )}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm line-clamp-1">{p.title}</h3>
+                    <p className="text-gray-500 text-xs capitalize mb-1">{p.city}, {p.state}</p>
+                    <p className="text-black font-bold">{formatPrice(p.price)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Similar properties */}
       {similarProperties.length > 0 && (
