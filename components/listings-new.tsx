@@ -36,8 +36,10 @@ export default function Listings({ properties }: ListingsProps) {
     }
   }, [properties])
 
+  if (properties.length === 0) return null
+
   return (
-    <section className="py-24 px-6 bg-white">
+    <section className="py-16 md:py-24 px-4 md:px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-12">
           <div>
@@ -47,8 +49,8 @@ export default function Listings({ properties }: ListingsProps) {
             >
               Listings
             </span>
-            <h2 className="text-4xl md:text-5xl font-bold text-black">
-              Find homes that perfectly<br />match your lifestyle
+            <h2 className="text-3xl md:text-5xl font-bold text-black max-w-md">
+              Find homes that perfectly match your lifestyle
             </h2>
           </div>
           <Link href="/listings">

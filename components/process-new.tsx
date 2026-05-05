@@ -60,7 +60,7 @@ export default function Process({ steps }: ProcessProps) {
   }, [steps])
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-white">
+    <section ref={sectionRef} className="py-16 md:py-24 px-4 md:px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div
           className={`text-center mb-16 transition-all duration-1000 ${
@@ -73,7 +73,7 @@ export default function Process({ steps }: ProcessProps) {
           >
             Process
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-black">
+          <h2 className="text-3xl md:text-5xl font-bold text-black">
             A smooth and stress free journey
           </h2>
           <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
@@ -88,7 +88,7 @@ export default function Process({ steps }: ProcessProps) {
               ref={(el) => {
                 cardRefs.current[index] = el
               }}
-              className={`group relative p-8 bg-gray-50 rounded-3xl hover:bg-white hover:shadow-xl transition-all duration-700 ${
+              className={`group relative p-6 md:p-8 bg-gray-50 rounded-3xl hover:bg-white hover:shadow-xl transition-all duration-700 ${
                 visibleCards.includes(index)
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-10'
