@@ -9,20 +9,10 @@ const PROVIDER = (['openai', 'anthropic', 'gemini', 'groq'].includes(process.env
   ? process.env.AI_PROVIDER
   : 'groq') as 'openai' | 'anthropic' | 'gemini' | 'groq'
 
-const OPENAI_COMPAT_CONFIGS = {
-  openai: { apiKey: process.env.OPENAI_API_KEY ?? '', baseURL: undefined, model: 'gpt-4o-mini' },
-  groq:   { apiKey: process.env.GROQ_API_KEY ?? '',   baseURL: 'https://api.groq.com/openai/v1', model: 'llama-3.1-8b-instant' },
-}
-
-const openaiClient = ['openai', 'groq'].includes(PROVIDER)
-  ? new OpenAI({ ...OPENAI_COMPAT_CONFIGS[PROVIDER as 'openai' | 'groq'] })
-  : null
-const anthropic = PROVIDER === 'anthropic' ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null
-const gemini    = PROVIDER === 'gemini'    ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '') : null
-
 async function callAI(system: string, user: string, maxTokens: number): Promise<string> {
-  if (PROVIDER === 'anthropic' && anthropic) {
-    const res = await anthropic.messages.create({
+  if (PROVIDER === 'anthropic') {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const res = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: maxTokens,
       system,
@@ -31,19 +21,21 @@ async function callAI(system: string, user: string, maxTokens: number): Promise<
     return res.content[0].type === 'text' ? res.content[0].text : ''
   }
 
-  if (PROVIDER === 'gemini' && gemini) {
-    const model = gemini.getGenerativeModel({
-      model: 'gemini-2.0-flash-lite',
-      systemInstruction: system,
-    })
+  if (PROVIDER === 'gemini') {
+    const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '')
+    const model = client.getGenerativeModel({ model: 'gemini-2.0-flash-lite', systemInstruction: system })
     const res = await model.generateContent(user)
     return res.response.text()
   }
 
-  // openai or groq
-  const config = OPENAI_COMPAT_CONFIGS[PROVIDER as 'openai' | 'groq']
-  const res = await openaiClient!.chat.completions.create({
-    model: config.model,
+  const configs = {
+    openai: { apiKey: process.env.OPENAI_API_KEY ?? '', baseURL: undefined,                          model: 'gpt-4o-mini'          },
+    groq:   { apiKey: process.env.GROQ_API_KEY   ?? '', baseURL: 'https://api.groq.com/openai/v1',  model: 'llama-3.1-8b-instant' },
+  }
+  const cfg = configs[PROVIDER as 'openai' | 'groq']
+  const client = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL })
+  const res = await client.chat.completions.create({
+    model: cfg.model,
     max_tokens: maxTokens,
     messages: [
       { role: 'system', content: system },
