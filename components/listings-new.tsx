@@ -41,20 +41,18 @@ export default function Listings({ properties }: ListingsProps) {
   return (
     <section className="py-16 md:py-24 px-4 md:px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-12">
-          <div>
-            <span
-              className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4"
-              style={{ backgroundColor: '#A8D5E2', color: '#1a1a1a' }}
-            >
-              Listings
-            </span>
-            <h2 className="text-3xl md:text-5xl font-bold text-black max-w-md">
-              Find homes that perfectly match your lifestyle
-            </h2>
-          </div>
-          <Link href="/listings">
-            <Button className="bg-black text-white hover:bg-black/90 rounded-full px-6 py-3 hidden md:flex items-center">
+        <div className="relative mb-12 text-center">
+          <span
+            className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4"
+            style={{ backgroundColor: '#A8D5E2', color: '#1a1a1a' }}
+          >
+            Listings
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold text-black">
+            Find homes that perfectly match your lifestyle
+          </h2>
+          <Link href="/listings" className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2">
+            <Button className="bg-black text-white hover:bg-black/90 rounded-full px-6 py-3 flex items-center">
               View all
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>

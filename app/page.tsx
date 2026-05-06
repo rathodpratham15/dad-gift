@@ -40,7 +40,7 @@ export default async function HomePage() {
     prisma.property.findMany({
       where: { featured: true, status: 'for_sale' },
       orderBy: { createdAt: 'desc' },
-      take: 6,
+      take: 3,
     }),
     prisma.testimonial.findMany({
       include: { property: { select: { id: true, title: true, slug: true } } },
