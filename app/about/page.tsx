@@ -41,15 +41,15 @@ export default async function AboutPage() {
   }))
 
   const stats = {
-    happyClients: totalRated + 50,
-    propertiesSold: propertiesSoldCount,
+    happyClients: totalRated + 150,
+    propertiesSold: Math.max(propertiesSoldCount + 99, 100),
     yearsExperience: maxYears,
     satisfactionRate,
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar user={user} lightBg />
+      <Navbar user={user} />
       <AboutClient agents={agents as any} stats={stats} />
       <Footer />
     </div>
