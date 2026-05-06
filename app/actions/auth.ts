@@ -2,6 +2,7 @@
 
 import { signIn, signOut } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/lib/auth'
 import bcrypt from 'bcryptjs'
 import { redirect } from 'next/navigation'
 import { AuthError } from 'next-auth'
@@ -72,6 +73,42 @@ export async function registerAction(formData: FormData) {
     }
     throw error
   }
+}
+
+export async function updateProfileAction(formData: FormData) {
+  const session = await auth()
+  if (!session?.user?.id) return { error: 'Not authenticated.' }
+
+  const userId = parseInt(session.user.id)
+  const firstName = (formData.get('firstName') as string)?.trim()
+  const lastName = (formData.get('lastName') as string)?.trim()
+  const currentPassword = (formData.get('currentPassword') as string) || ''
+  const newPassword = (formData.get('newPassword') as string) || ''
+  const confirmPassword = (formData.get('confirmPassword') as string) || ''
+
+  if (!firstName) return { error: 'First name is required.' }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) return { error: 'User not found.' }
+
+  const updateData: Record<string, unknown> = { firstName, lastName: lastName || '' }
+
+  if (newPassword) {
+    if (newPassword.length < 8) return { error: 'New password must be at least 8 characters.' }
+    if (!/[A-Z]/.test(newPassword)) return { error: 'New password must contain at least one uppercase letter.' }
+    if (!/[a-z]/.test(newPassword)) return { error: 'New password must contain at least one lowercase letter.' }
+    if (!/[0-9]/.test(newPassword)) return { error: 'New password must contain at least one number.' }
+    if (!/[^A-Za-z0-9]/.test(newPassword)) return { error: 'New password must contain at least one special character.' }
+    if (newPassword !== confirmPassword) return { error: 'New passwords do not match.' }
+    if (user.password) {
+      const valid = await bcrypt.compare(currentPassword, user.password)
+      if (!valid) return { error: 'Current password is incorrect.' }
+    }
+    updateData.password = await bcrypt.hash(newPassword, 12)
+  }
+
+  await prisma.user.update({ where: { id: userId }, data: updateData })
+  return { success: 'Profile updated successfully.' }
 }
 
 export async function logoutAction() {

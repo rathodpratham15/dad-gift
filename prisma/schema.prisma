@@ -9,20 +9,21 @@ datasource db {
 }
 
 model User {
-  id                 Int        @id @default(autoincrement())
-  email              String     @unique
+  id                 Int           @id @default(autoincrement())
+  email              String        @unique
   password           String?
-  firstName          String     @map("first_name")
-  lastName           String     @map("last_name")
-  googleId           String?    @unique @map("google_id")
+  firstName          String        @map("first_name")
+  lastName           String        @map("last_name")
+  googleId           String?       @unique @map("google_id")
   image              String?
-  role               String     @default("user")
-  isActive           Boolean    @default(true) @map("is_active")
-  createdAt          DateTime   @default(now()) @map("created_at")
-  updatedAt          DateTime   @updatedAt @map("updated_at")
+  role               String        @default("user")
+  isActive           Boolean       @default(true) @map("is_active")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
   properties         Property[]
   contacts           Contact[]
-  favoriteProperties Property[] @relation("UserFavorites")
+  favoriteProperties Property[]    @relation("UserFavorites")
+  savedSearches      SavedSearch[]
 
   @@map("users")
 }
@@ -78,14 +79,43 @@ model Property {
   images            Json?
   videos            Json?
   features          Json?
+  floorNumber       Int?          @map("floor_number")
+  totalFloors       Int?          @map("total_floors")
+  parkingSpots      Int?          @map("parking_spots")
+  furnishing        String?
+  facing            String?
+  availableFrom     DateTime?     @map("available_from")
   createdAt         DateTime      @default(now()) @map("created_at")
   updatedAt         DateTime      @updatedAt @map("updated_at")
   user              User?         @relation(fields: [userId], references: [id])
   agent             Agent?        @relation(fields: [agentId], references: [id])
   testimonials      Testimonial[]
   favoritedBy       User[]        @relation("UserFavorites")
+  views             PropertyView[]
 
   @@map("properties")
+}
+
+model SavedSearch {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String?
+  filters   Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("saved_searches")
+}
+
+model PropertyView {
+  id         Int      @id @default(autoincrement())
+  propertyId Int      @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  userId     Int?     @map("user_id")
+  ipAddress  String?  @map("ip_address")
+  viewedAt   DateTime @default(now()) @map("viewed_at")
+
+  @@map("property_views")
 }
 
 model BlogPost {

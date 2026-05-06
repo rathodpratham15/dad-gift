@@ -268,12 +268,108 @@ export default function PropertyDetailClient({
                   <p className="text-sm text-gray-600">Year Built</p>
                 </div>
               )}
+              {property.floorNumber != null && (
+                <div className="bg-gray-50 rounded-2xl p-4 text-center">
+                  <Maximize className="h-6 w-6 mx-auto mb-2 text-gray-600" />
+                  <p className="text-2xl font-bold">
+                    {property.floorNumber}{property.totalFloors ? `/${property.totalFloors}` : ''}
+                  </p>
+                  <p className="text-sm text-gray-600">Floor</p>
+                </div>
+              )}
+              {property.parkingSpots != null && (
+                <div className="bg-gray-50 rounded-2xl p-4 text-center">
+                  <MapPin className="h-6 w-6 mx-auto mb-2 text-gray-600" />
+                  <p className="text-2xl font-bold">{property.parkingSpots}</p>
+                  <p className="text-sm text-gray-600">Parking</p>
+                </div>
+              )}
             </div>
+
+            {/* Property Info */}
+            {(property.furnishing || property.facing || property.availableFrom) && (
+              <div className="flex flex-wrap gap-3 mb-8">
+                {property.furnishing && (
+                  <span className="px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-medium capitalize">
+                    {property.furnishing.replace(/_/g, ' ')}
+                  </span>
+                )}
+                {property.facing && (
+                  <span className="px-4 py-2 rounded-full bg-amber-50 text-amber-700 text-sm font-medium capitalize">
+                    {property.facing.replace(/_/g, '-')} facing
+                  </span>
+                )}
+                {property.availableFrom && (
+                  <span className="px-4 py-2 rounded-full bg-green-50 text-green-700 text-sm font-medium">
+                    Available from {new Date(property.availableFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                )}
+              </div>
+            )}
 
             {property.description && (
               <div className="mb-8">
                 <h2 className="text-2xl font-bold mb-4">Description</h2>
                 <p className="text-gray-700 leading-relaxed">{property.description}</p>
+              </div>
+            )}
+
+            {/* Amenities */}
+            {property.features && Object.values(property.features).some(Boolean) && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4">Amenities</h2>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(property.features)
+                    .filter(([, v]) => v)
+                    .map(([key]) => (
+                      <span
+                        key={key}
+                        className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium capitalize"
+                      >
+                        {key.replace(/_/g, ' ')}
+                      </span>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Videos */}
+            {property.videos && property.videos.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4">Videos</h2>
+                <div className="space-y-4">
+                  {property.videos.map((url, i) => {
+                    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
+                    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/)
+                    if (ytMatch) {
+                      return (
+                        <div key={i} className="rounded-2xl overflow-hidden aspect-video">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+                            className="w-full h-full"
+                            title={`Video ${i + 1}`}
+                            allowFullScreen
+                          />
+                        </div>
+                      )
+                    }
+                    if (vimeoMatch) {
+                      return (
+                        <div key={i} className="rounded-2xl overflow-hidden aspect-video">
+                          <iframe
+                            src={`https://player.vimeo.com/video/${vimeoMatch[1]}`}
+                            className="w-full h-full"
+                            title={`Video ${i + 1}`}
+                            allowFullScreen
+                          />
+                        </div>
+                      )
+                    }
+                    return (
+                      <video key={i} src={url} controls className="w-full rounded-2xl" />
+                    )
+                  })}
+                </div>
               </div>
             )}
 

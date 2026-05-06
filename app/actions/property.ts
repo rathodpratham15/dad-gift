@@ -81,6 +81,12 @@ export async function createPropertyAction(formData: FormData) {
         images: imagesJson,
         videos: videosJson,
         features: featuresJson as object ?? undefined,
+        floorNumber: parseI('floorNumber'),
+        totalFloors: parseI('totalFloors'),
+        parkingSpots: parseI('parkingSpots'),
+        furnishing: (formData.get('furnishing') as string) || null,
+        facing: (formData.get('facing') as string) || null,
+        availableFrom: formData.get('availableFrom') ? new Date(formData.get('availableFrom') as string) : null,
         userId: parseInt(session.user.id),
       },
     })
@@ -158,6 +164,14 @@ export async function updatePropertyAction(id: number, formData: FormData) {
         images: imagesJson,
         videos: videosJson,
         features: featuresJson as object ?? undefined,
+        floorNumber: parseI('floorNumber', property.floorNumber),
+        totalFloors: parseI('totalFloors', property.totalFloors),
+        parkingSpots: parseI('parkingSpots', property.parkingSpots),
+        furnishing: (formData.get('furnishing') as string) || property.furnishing || null,
+        facing: (formData.get('facing') as string) || property.facing || null,
+        availableFrom: formData.get('availableFrom')
+          ? new Date(formData.get('availableFrom') as string)
+          : property.availableFrom ?? null,
       },
     })
   } catch {
