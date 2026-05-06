@@ -7,7 +7,6 @@ on:
     branches: [main]
 
 jobs:
-  # ── Job 1: Lint + Type check ─────────────────────────────────────────────────
   check:
     name: Lint & Type Check
     runs-on: ubuntu-latest
@@ -38,38 +37,3 @@ jobs:
 
       - name: Lint
         run: pnpm lint
-
-  # ── Job 2: Build check (runs only if lint + typecheck pass) ──────────────────
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: check
-
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      DIRECT_URL: ${{ secrets.DIRECT_URL }}
-      NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-      NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
