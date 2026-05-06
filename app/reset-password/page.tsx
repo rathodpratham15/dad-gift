@@ -183,7 +183,7 @@ export default function ResetPasswordPage() {
       >
         <div className="absolute top-4 left-5 lg:top-8 lg:left-8 z-10">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo-white.png" alt="Realest" width={32} height={32} className="h-8 w-8 object-contain" />
+            <Image src="/logo-white.png" alt="Realest" width={40} height={40} className="h-10 w-10 object-contain" />
             <span className="text-xl lg:text-2xl font-bold text-black/75">Realest</span>
           </Link>
         </div>
