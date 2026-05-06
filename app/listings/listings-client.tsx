@@ -40,9 +40,7 @@ interface CopilotResponse {
 declare global { interface Window { google?: any } }
 
 function formatPrice(price: number) {
-  const s = Math.floor(price).toString()
-  if (s.length <= 3) return `₹${s}`
-  return `₹${s.replace(/\B(?=(\d{2})+(?!\d))/g, ',')}`
+  return `₹${Math.floor(price).toLocaleString('en-IN')}`
 }
 
 function buildUrl(filters: Filters, page = 1) {
@@ -250,7 +248,7 @@ export default function ListingsClient({ properties, filters, cities, googleMaps
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }} className="mt-4 p-6 bg-white rounded-2xl shadow-lg grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div><label className="block text-sm font-medium mb-2 text-black">Property Type</label>
                   <select value={localFilters.propertyType || ''} onChange={(e) => handleFilterChange('propertyType', e.target.value || null)} className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-black">
-                    <option value="">All Types</option><option value="house">House</option><option value="shop">Shop</option><option value="godown">Godown</option><option value="land">Land</option><option value="commercial">Commercial</option><option value="other">Other</option>
+                    <option value="">All Types</option><option value="apartment">Apartment</option><option value="house">House</option><option value="villa">Villa</option><option value="shop">Shop</option><option value="godown">Godown</option><option value="land">Land</option><option value="commercial">Commercial</option><option value="other">Other</option>
                   </select></div>
                 <div><label className="block text-sm font-medium mb-2 text-black">Status</label>
                   <select value={localFilters.status || 'for_sale'} onChange={(e) => handleFilterChange('status', e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-white text-black">
@@ -298,7 +296,12 @@ export default function ListingsClient({ properties, filters, cities, googleMaps
                           <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center"><span className="text-slate-400">No Image</span></div>
                         )}
                         <div className="absolute top-4 right-4 bg-white px-4 py-2 rounded-full shadow-lg"><p className="text-lg font-bold text-black">{formatPrice(property.price)}</p></div>
-                        {property.isPopular && <div className="absolute top-4 left-4 bg-rose-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">Popular</div>}
+                        <div className="absolute top-4 left-4 flex gap-2">
+                          {property.isPopular && <div className="bg-rose-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">Popular</div>}
+                          <div className={`px-3 py-1 rounded-full text-xs font-semibold ${property.status === 'for_sale' ? 'bg-green-500/90 text-white' : 'bg-blue-500/90 text-white'}`}>
+                            {property.status === 'for_sale' ? 'For Sale' : 'Rental'}
+                          </div>
+                        </div>
                       </div>
                       <div className="p-6">
                         <h3 className="text-lg font-bold text-black mb-2 capitalize group-hover:text-gray-700 transition-colors">{property.title}</h3>
@@ -359,7 +362,6 @@ export default function ListingsClient({ properties, filters, cities, googleMaps
                     ))}
                   </div>
                 )}
-                <p className="mt-3 text-xs text-gray-500">Pipeline: {copilotResult.trace?.steps?.join(' -> ') || 'n/a'}</p>
               </div>
             )}
           </div>

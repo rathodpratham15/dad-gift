@@ -1,31 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
+import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { prisma } from '@/lib/prisma'
 
-type CopilotIntent = 'buy' | 'rent' | 'sell' | 'popular' | 'nearby' | 'general'
+// Switch provider: AI_PROVIDER=openai | anthropic | gemini | groq  (default: groq)
+const PROVIDER = (['openai', 'anthropic', 'gemini', 'groq'].includes(process.env.AI_PROVIDER ?? '')
+  ? process.env.AI_PROVIDER
+  : 'groq') as 'openai' | 'anthropic' | 'gemini' | 'groq'
 
-function parseIntent(question: string): CopilotIntent {
-  const q = question.toLowerCase()
-  if (q.includes('rent') || q.includes('rental') || q.includes('lease')) return 'rent'
-  if (q.includes('sell') || q.includes('list my property')) return 'sell'
-  if (q.includes('popular') || q.includes('best') || q.includes('top')) return 'popular'
-  if (q.includes('near') || q.includes('nearby') || q.includes('closest')) return 'nearby'
-  if (q.includes('buy') || q.includes('purchase')) return 'buy'
-  return 'general'
-}
+async function callAI(system: string, user: string, maxTokens: number): Promise<string> {
+  if (PROVIDER === 'anthropic') {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const res = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: maxTokens,
+      system,
+      messages: [{ role: 'user', content: user }],
+    })
+    return res.content[0].type === 'text' ? res.content[0].text : ''
+  }
 
-function runGuardrails(question: string): { sanitized: string; notes: string[] } {
-  const notes: string[] = []
-  let sanitized = question.trim()
-  if (sanitized.length > 600) {
-    sanitized = sanitized.slice(0, 600)
-    notes.push('Truncated long prompt.')
+  if (PROVIDER === 'gemini') {
+    const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '')
+    const model = client.getGenerativeModel({ model: 'gemini-2.0-flash-lite', systemInstruction: system })
+    const res = await model.generateContent(user)
+    return res.response.text()
   }
-  const blocked = ['hack', 'exploit', 'bypass']
-  if (blocked.some((w) => sanitized.toLowerCase().includes(w))) {
-    notes.push('Blocked unsafe intent keywords.')
-    sanitized = 'Show me available properties'
+
+  const configs = {
+    openai: { apiKey: process.env.OPENAI_API_KEY ?? '', baseURL: undefined,                          model: 'gpt-4o-mini'          },
+    groq:   { apiKey: process.env.GROQ_API_KEY   ?? '', baseURL: 'https://api.groq.com/openai/v1',  model: 'llama-3.1-8b-instant' },
   }
-  return { sanitized, notes }
+  const cfg = configs[PROVIDER as 'openai' | 'groq']
+  const client = new OpenAI({ apiKey: cfg.apiKey, baseURL: cfg.baseURL })
+  const res = await client.chat.completions.create({
+    model: cfg.model,
+    max_tokens: maxTokens,
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: user },
+    ],
+  })
+  return res.choices[0].message.content ?? ''
 }
 
 function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -33,11 +50,8 @@ function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): num
   const dLat = ((lat2 - lat1) * Math.PI) / 180
   const dLon = ((lon2 - lon1) * Math.PI) / 180
   const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2)
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 }
 
@@ -46,84 +60,97 @@ export async function GET(req: NextRequest) {
   const question = searchParams.get('question')?.trim()
   if (!question) return NextResponse.json({ error: 'question is required' }, { status: 400 })
 
-  const { sanitized, notes } = runGuardrails(question)
-  const intent = parseIntent(sanitized)
-  const steps: string[] = []
+  const userLat = searchParams.get('latitude') ? Number(searchParams.get('latitude')) : null
+  const userLon = searchParams.get('longitude') ? Number(searchParams.get('longitude')) : null
 
-  const city = searchParams.get('city')
-  const status = searchParams.get('status')
-  const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : null
-  const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : null
-  const bedrooms = searchParams.get('bedrooms') ? Number(searchParams.get('bedrooms')) : null
-  const latitude = searchParams.get('latitude') ? Number(searchParams.get('latitude')) : null
-  const longitude = searchParams.get('longitude') ? Number(searchParams.get('longitude')) : null
+  // Step 1: Extract structured filters from natural language
+  let filters: {
+    city?: string | null
+    status?: 'for_sale' | 'rental' | null
+    minPrice?: number | null
+    maxPrice?: number | null
+    minBedrooms?: number | null
+    nearby?: boolean
+  } = {}
 
+  try {
+    const raw = await callAI(
+      `You are a real estate search assistant. Extract search filters from the user's query and return ONLY valid JSON with these optional fields:
+{
+  "city": string or null,
+  "status": "for_sale" | "rental" | null,
+  "minPrice": number or null,
+  "maxPrice": number or null,
+  "minBedrooms": number or null,
+  "nearby": boolean
+}
+Rules:
+- Prices are in Indian Rupees. Convert "1 crore" = 10000000, "1 lakh" = 100000
+- renting/lease → status: "rental", buying/purchase → status: "for_sale", null if unclear
+- Return ONLY the JSON object, no explanation`,
+      question,
+      300
+    )
+    filters = JSON.parse(raw)
+  } catch {
+    filters = {}
+  }
+
+  // Step 2: Query the database with extracted filters
   const where: Record<string, unknown> = {}
-  if (intent === 'rent') where.status = 'rental'
-  else if (intent !== 'sell') where.status = status || 'for_sale'
-  if (city) where.city = { contains: city, mode: 'insensitive' }
-  if (minPrice) where.price = { ...((where.price as object) || {}), gte: minPrice }
-  if (maxPrice) where.price = { ...((where.price as object) || {}), lte: maxPrice }
-  if (bedrooms) where.bedrooms = { gte: bedrooms }
-  if (intent === 'popular') where.isPopular = true
-
-  steps.push(`Intent: ${intent}`, `Filters: ${JSON.stringify(where)}`)
+  if (filters.status) where.status = filters.status
+  if (filters.city) where.city = { contains: filters.city, mode: 'insensitive' }
+  if (filters.minPrice || filters.maxPrice) {
+    where.price = {
+      ...(filters.minPrice ? { gte: filters.minPrice } : {}),
+      ...(filters.maxPrice ? { lte: filters.maxPrice } : {}),
+    }
+  }
+  if (filters.minBedrooms) where.bedrooms = { gte: filters.minBedrooms }
 
   const rawProperties = await prisma.property.findMany({
     where,
     orderBy: [{ isPopular: 'desc' }, { createdAt: 'desc' }],
     take: 10,
     select: {
-      id: true,
-      title: true,
-      slug: true,
-      price: true,
-      city: true,
-      address: true,
-      bedrooms: true,
-      bathrooms: true,
-      isPopular: true,
-      rating: true,
-      latitude: true,
-      longitude: true,
+      id: true, title: true, slug: true, price: true, city: true,
+      address: true, bedrooms: true, bathrooms: true, squareFeet: true,
+      isPopular: true, rating: true, latitude: true, longitude: true, status: true,
     },
   })
 
-  let properties = rawProperties.map((p) => {
-    const why: string[] = []
-    if (p.isPopular) why.push('Popular listing')
-    if (p.rating && p.rating >= 4) why.push(`Rated ${p.rating}/5`)
-    if (latitude && longitude && p.latitude && p.longitude) {
-      const d = distanceKm(latitude, longitude, p.latitude, p.longitude)
-      if (d < 10) why.push(`Only ${d.toFixed(1)}km away`)
-    }
-    return { ...p, why, overallRating: p.rating }
-  })
-
-  if (intent === 'nearby' && latitude && longitude) {
-    properties = properties
+  let properties = rawProperties
+  if (userLat && userLon && filters.nearby) {
+    properties = rawProperties
       .filter((p) => p.latitude && p.longitude)
-      .sort((a, b) => {
-        const da = distanceKm(latitude, longitude, a.latitude!, a.longitude!)
-        const db = distanceKm(latitude, longitude, b.latitude!, b.longitude!)
-        return da - db
-      })
-      .slice(0, 5)
+      .sort((a, b) =>
+        distanceKm(userLat, userLon, a.latitude!, a.longitude!) -
+        distanceKm(userLat, userLon, b.latitude!, b.longitude!)
+      )
   }
 
-  const intentMessages: Record<CopilotIntent, string> = {
-    buy: `Here are properties available for purchase${city ? ` in ${city}` : ''}.`,
-    rent: `Here are rental properties${city ? ` in ${city}` : ''}.`,
-    sell: 'To list your property with us, please use the contact form or WhatsApp us directly.',
-    popular: `Here are our most popular properties${city ? ` in ${city}` : ''}.`,
-    nearby: latitude ? 'Here are properties near your location.' : 'Please share your location for nearby results.',
-    general: `Here are some properties that might interest you${city ? ` in ${city}` : ''}.`,
-  }
+  const top5 = properties.slice(0, 5)
+
+  // Step 3: Generate a natural language answer
+  const propertyList =
+    top5.length > 0
+      ? top5.map((p, i) =>
+          `${i + 1}. ${p.title} — ₹${p.price.toLocaleString('en-IN')}, ${p.bedrooms}BR/${p.bathrooms}BA, ${p.city}${p.squareFeet ? `, ${p.squareFeet} sq ft` : ''}${p.isPopular ? ', ⭐ Popular' : ''}`
+        ).join('\n')
+      : 'No properties found matching these criteria.'
+
+  const answer = await callAI(
+    `You are a friendly real estate assistant for Realest, an Indian property platform.
+Write a concise 1-2 sentence response to the user's query based on the search results.
+Be conversational and specific. If no results, suggest broadening the search criteria.
+Do not list the properties — just summarize naturally.`,
+    `User asked: "${question}"\n\nSearch results:\n${propertyList}`,
+    150
+  )
 
   return NextResponse.json({
-    answer: intentMessages[intent],
-    intent,
-    properties: properties.slice(0, 5),
-    trace: { guardrails: notes, queryTerms: [sanitized], steps },
+    answer: answer || (top5.length > 0 ? `Found ${top5.length} properties matching your search.` : 'No properties found. Try broadening your search.'),
+    properties: top5,
+    filters,
   })
 }

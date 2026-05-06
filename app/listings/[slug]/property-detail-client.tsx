@@ -31,6 +31,16 @@ export default function PropertyDetailClient({
   const [isVisible, setIsVisible] = useState(false)
   const [isFavorited, setIsFavorited] = useState(false)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+
+  const allImages = [
+    ...(property.mainImage ? [property.mainImage] : []),
+    ...(property.images || []),
+  ]
+  const openLightbox = (index: number) => setLightboxIndex(index)
+  const closeLightbox = () => setLightboxIndex(null)
+  const prevImage = () => setLightboxIndex((i) => (i !== null ? (i - 1 + allImages.length) % allImages.length : 0))
+  const nextImage = () => setLightboxIndex((i) => (i !== null ? (i + 1) % allImages.length : 0))
   const { toast } = useToast()
   const router = useRouter()
 
@@ -44,6 +54,17 @@ export default function PropertyDetailClient({
   })
   const [submitting, setSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
+
+  useEffect(() => {
+    if (lightboxIndex === null) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prevImage()
+      if (e.key === 'ArrowRight') nextImage()
+      if (e.key === 'Escape') closeLightbox()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [lightboxIndex])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -144,9 +165,15 @@ export default function PropertyDetailClient({
                   </p>
                 )}
               </div>
-              <div className="text-right">
+              <div className="flex items-center gap-3 flex-wrap justify-end">
                 <p className="text-4xl font-bold text-black">{formatPrice(property.price)}</p>
-                <p className="text-gray-600 capitalize mt-1">{property.status.replace('_', ' ')}</p>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  property.status === 'for_sale'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-blue-100 text-blue-700'
+                }`}>
+                  {property.status === 'for_sale' ? 'For Sale' : 'Rental'}
+                </span>
               </div>
             </div>
           </div>
@@ -156,31 +183,55 @@ export default function PropertyDetailClient({
       {/* Image gallery */}
       <section className="px-6 pb-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="aspect-[4/3] rounded-3xl overflow-hidden bg-gray-200">
-              {property.mainImage ? (
-                <img
-                  src={property.mainImage}
-                  alt={property.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  No Image
-                </div>
-              )}
-            </div>
-            {property.images?.slice(0, 1).map((img, i) => (
-              <div key={i} className="aspect-[4/3] rounded-3xl overflow-hidden bg-gray-200">
-                <img
-                  src={img}
-                  alt={`${property.title} ${i + 1}`}
-                  className="w-full h-full object-cover"
-                />
+          {allImages.length === 0 ? (
+            <div className="aspect-[16/7] rounded-3xl bg-gray-100 flex items-center justify-center text-gray-400">No Images</div>
+          ) : (
+            <div className={`grid gap-3 ${allImages.length === 1 ? 'grid-cols-1' : 'grid-cols-3'}`} style={{ gridTemplateRows: allImages.length > 1 ? 'repeat(2, 1fr)' : undefined }}>
+              {/* Main image — spans full height on left */}
+              <div
+                className={`relative cursor-pointer overflow-hidden rounded-3xl bg-gray-200 ${allImages.length > 1 ? 'col-span-2 row-span-2' : ''} aspect-[4/3]`}
+                onClick={() => openLightbox(0)}
+              >
+                <img src={allImages[0]} alt={property.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
               </div>
-            ))}
-          </div>
+
+              {/* Right side — exactly 2 thumbnails */}
+              {allImages.length > 1 && allImages.slice(1, 3).map((img, i) => {
+                const isLast = i === 1 && allImages.length > 3
+                return (
+                  <div
+                    key={i}
+                    className="relative cursor-pointer overflow-hidden rounded-2xl bg-gray-200"
+                    onClick={() => openLightbox(i + 1)}
+                  >
+                    <img src={img} alt={`${property.title} ${i + 2}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                    {isLast && (
+                      <div className="absolute inset-0 bg-black/55 flex items-center justify-center rounded-2xl">
+                        <span className="text-white text-2xl font-bold">+{allImages.length - 3}</span>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
+
+        {/* Lightbox */}
+        {lightboxIndex !== null && (
+          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center" onClick={closeLightbox}>
+            <button onClick={(e) => { e.stopPropagation(); prevImage() }} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center text-xl transition-colors">‹</button>
+            <button onClick={(e) => { e.stopPropagation(); nextImage() }} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center text-xl transition-colors">›</button>
+            <button onClick={closeLightbox} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/20 hover:bg-white/40 text-white flex items-center justify-center transition-colors">✕</button>
+            <img
+              src={allImages[lightboxIndex]}
+              alt={`${property.title} ${lightboxIndex + 1}`}
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">{lightboxIndex + 1} / {allImages.length}</div>
+          </div>
+        )}
       </section>
 
       {/* Details */}

@@ -15,8 +15,5 @@ export function slugify(text: string): string {
 }
 
 export function formatPrice(price: number): string {
-  const priceStr = Math.floor(price).toString()
-  if (priceStr.length <= 3) return `₹${priceStr}`
-  const formatted = priceStr.replace(/\B(?=(\d{2})+(?!\d))/g, ',')
-  return `₹${formatted}`
+  return `₹${Math.floor(price).toLocaleString('en-IN')}`
 }
