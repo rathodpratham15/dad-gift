@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs'
 import { Resend } from 'resend'
 import { prisma } from '@/lib/prisma'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://realestate.pratham.click'
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'noreply@realestate.pratham.click'
 
@@ -28,6 +27,7 @@ export async function forgotPasswordAction(formData: FormData) {
 
   const resetUrl = `${BASE_URL}/reset-password?token=${token}`
 
+  const resend = new Resend(process.env.RESEND_API_KEY)
   await resend.emails.send({
     from: FROM_EMAIL,
     to: email,
