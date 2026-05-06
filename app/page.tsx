@@ -36,7 +36,7 @@ export default async function HomePage() {
   const session = await auth()
   const user = session?.user ? { firstName: (session.user as any).firstName, role: (session.user as any).role } : null
 
-  const [featuredPropertiesRaw, testimonials, recentBlogPosts] = await Promise.all([
+  const [featuredPropertiesRaw, testimonials, recentBlogPosts, propertyCount] = await Promise.all([
     prisma.property.findMany({
       where: { featured: true, status: 'for_sale' },
       orderBy: { createdAt: 'desc' },
@@ -53,6 +53,7 @@ export default async function HomePage() {
       orderBy: { publishedAt: 'desc' },
       take: 3,
     }),
+    prisma.property.count(),
   ])
 
   const featuredProperties = featuredPropertiesRaw.map((p) => ({
@@ -74,7 +75,7 @@ export default async function HomePage() {
     <div className="flex flex-col min-h-screen">
       <Navbar user={user} />
       <main className="flex-1">
-        <Hero />
+        <Hero propertyCount={propertyCount} />
         <Listings properties={featuredProperties as any} />
         <Testimonials testimonials={serializedTestimonials as any} />
         <Process steps={processSteps} />

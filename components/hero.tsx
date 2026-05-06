@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from './ui/button'
 
-const stats = [
-  { value: '200+', label: 'Properties Listed' },
-  { value: '150+', label: 'Happy Clients' },
-  { value: '10+', label: 'Years Experience' },
-  { value: '98%', label: 'Satisfaction Rate' },
-]
-
-export default function Hero() {
+export default function Hero({ propertyCount }: { propertyCount?: number }) {
+  const displayCount = propertyCount !== undefined ? `${propertyCount}+` : '200+'
+  const stats = [
+    { value: displayCount, label: 'Properties Listed' },
+    { value: '150+', label: 'Happy Clients' },
+    { value: '10+', label: 'Years Experience' },
+    { value: '98%', label: 'Satisfaction Rate' },
+  ]
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -65,9 +65,9 @@ export default function Hero() {
           }`}
         >
           {stats.map((stat) => (
-            <div key={stat.label} className="bg-white/20 backdrop-blur-sm rounded-2xl px-4 py-4">
-              <p className="text-3xl font-bold text-white">{stat.value}</p>
-              <p className="text-sm text-white/80 mt-1">{stat.label}</p>
+            <div key={stat.label} className="bg-white/70 backdrop-blur-md rounded-2xl px-4 py-4">
+              <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+              <p className="text-sm text-gray-600 mt-1">{stat.label}</p>
             </div>
           ))}
         </div>
