@@ -44,14 +44,14 @@ export default function Navbar({ user, lightBg }: NavbarProps) {
           scrolled || mobileOpen ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src={lightBg || scrolled || mobileOpen ? '/logo-blue.png' : '/logo-white.png'}
               alt="Realest logo"
-              width={36}
-              height={36}
-              className="h-9 w-9 object-contain"
+              width={50}
+              height={50}
+              className="h-11 w-11 object-contain"
             />
             <span className="text-2xl font-bold text-black">Realest</span>
           </Link>
