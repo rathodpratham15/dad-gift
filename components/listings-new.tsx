@@ -89,11 +89,14 @@ export default function Listings({ properties }: ListingsProps) {
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                {property.isPopular && (
-                  <div className="absolute top-4 left-4 bg-rose-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                    Popular
+                <div className="absolute top-4 left-4 flex gap-2">
+                  {property.isPopular && (
+                    <div className="bg-rose-500/90 text-white px-3 py-1 rounded-full text-xs font-semibold">Popular</div>
+                  )}
+                  <div className={`px-3 py-1 rounded-full text-xs font-semibold ${property.status === 'for_sale' ? 'bg-green-500/90 text-white' : 'bg-blue-500/90 text-white'}`}>
+                    {property.status === 'for_sale' ? 'For Sale' : 'Rental'}
                   </div>
-                )}
+                </div>
               </div>
               <div className="px-2">
                 <h3 className="text-xl font-semibold text-black mb-2 capitalize">{property.title}</h3>
@@ -105,7 +108,7 @@ export default function Listings({ properties }: ListingsProps) {
                   </p>
                 )}
                 <p className="text-2xl font-bold text-black mb-3">
-                  ₹{Math.floor(property.price).toLocaleString('en-IN')}
+                  {`₹${Math.floor(property.price).toLocaleString('en-IN')}`}
                 </p>
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   {property.bedrooms && (

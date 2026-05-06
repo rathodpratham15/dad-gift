@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import type { Property } from '@/lib/types'
-import { Upload, X, Plus, MapPin, Loader2 } from 'lucide-react'
+import { Upload, X, MapPin, Loader2 } from 'lucide-react'
 
 interface PropertyFormProps {
   property?: Partial<Property>
@@ -17,6 +17,8 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
   const [result, setResult] = useState<{ error?: string; success?: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null)
+  const [urlInput, setUrlInput] = useState('')
   const [geocoding, setGeocoding] = useState(false)
   const [mainImage, setMainImage] = useState(property?.mainImage || '')
   const [images, setImages] = useState<string[]>(property?.images || [])
@@ -28,24 +30,41 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
   const formRef = useRef<HTMLFormElement>(null)
 
   const handleUpload = async (file: File, isMain: boolean) => {
+    const fd = new FormData()
+    fd.append('file', file)
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const data = await res.json()
+    if (!data.url) throw new Error('No URL returned')
+    if (isMain) setMainImage(data.url)
+    else setImages((prev) => [...prev, data.url])
+  }
+
+  const handleGalleryFiles = async (files: FileList) => {
+    const fileArr = Array.from(files)
     setUploading(true)
-    try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
-      const data = await res.json()
-      if (data.url) {
-        if (isMain) {
-          setMainImage(data.url)
-        } else {
-          setImages((prev) => [...prev, data.url])
-        }
+    setUploadProgress({ done: 0, total: fileArr.length })
+    const errors: string[] = []
+    for (let i = 0; i < fileArr.length; i++) {
+      try {
+        await handleUpload(fileArr[i], false)
+        setUploadProgress({ done: i + 1, total: fileArr.length })
+      } catch {
+        errors.push(fileArr[i].name)
       }
-    } catch {
-      setResult({ error: 'Upload failed. Please try again.' })
-    } finally {
-      setUploading(false)
     }
+    if (errors.length) setResult({ error: `Failed to upload: ${errors.join(', ')}` })
+    setUploading(false)
+    setUploadProgress(null)
+  }
+
+  const handleAddUrls = () => {
+    const urls = urlInput
+      .split('\n')
+      .map((u) => u.trim())
+      .filter((u) => u.startsWith('http'))
+    if (urls.length === 0) return
+    setImages((prev) => [...prev, ...urls])
+    setUrlInput('')
   }
 
   const handleGeocode = async () => {
@@ -147,7 +166,9 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
               onChange={(e) => setPropertyType(e.target.value)}
               className={`${inputCls} bg-white`}
             >
+              <option value="apartment">Apartment</option>
               <option value="house">House</option>
+              <option value="villa">Villa</option>
               <option value="shop">Shop</option>
               <option value="godown">Godown</option>
               <option value="land">Land</option>
@@ -430,6 +451,8 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
         {/* Gallery */}
         <div>
           <label className={labelCls}>Gallery Images</label>
+
+          {/* Thumbnails */}
           <div className="flex flex-wrap gap-3 mb-3">
             {images.map((img, i) => (
               <div key={i} className="relative">
@@ -450,38 +473,55 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
             <input
               type="file"
               accept="image/*"
+              multiple
               ref={galleryInputRef}
               className="hidden"
               onChange={(e) => {
-                const file = e.target.files?.[0]
-                if (file) handleUpload(file, false)
+                if (e.target.files?.length) handleGalleryFiles(e.target.files)
+                e.target.value = ''
               }}
             />
             <button
               type="button"
               onClick={() => galleryInputRef.current?.click()}
               disabled={uploading}
-              className="w-24 h-20 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
+              className="w-24 h-20 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors disabled:opacity-50"
             >
-              <Plus className="h-5 w-5" />
-              <span className="text-xs">Add</span>
+              {uploadProgress ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span className="text-xs">{uploadProgress.done}/{uploadProgress.total}</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="h-5 w-5" />
+                  <span className="text-xs">Upload</span>
+                </>
+              )}
             </button>
           </div>
-          <textarea
-            value={JSON.stringify(images)}
-            onChange={(e) => {
-              try {
-                const parsed = JSON.parse(e.target.value)
-                if (Array.isArray(parsed)) setImages(parsed)
-              } catch {}
-            }}
-            placeholder='["https://url1.jpg", "https://url2.jpg"]'
-            className={`${inputCls} resize-none text-xs font-mono`}
-            rows={2}
-          />
-          <p className="text-xs text-gray-400 mt-1">
-            JSON array of image URLs, or use the upload button above.
-          </p>
+
+          {/* Paste URLs */}
+          <div className="mt-3">
+            <label className="block text-xs font-medium text-gray-500 mb-1">Paste image URLs (one per line)</label>
+            <div className="flex gap-2">
+              <textarea
+                value={urlInput}
+                onChange={(e) => setUrlInput(e.target.value)}
+                placeholder={"https://example.com/image1.jpg\nhttps://example.com/image2.jpg"}
+                className={`${inputCls} resize-none text-xs flex-1`}
+                rows={3}
+              />
+              <button
+                type="button"
+                onClick={handleAddUrls}
+                disabled={!urlInput.trim()}
+                className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-black transition-colors disabled:opacity-40 self-end"
+              >
+                Add
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
