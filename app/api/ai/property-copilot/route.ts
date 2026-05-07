@@ -67,9 +67,15 @@ export async function GET(req: NextRequest) {
   let filters: {
     city?: string | null
     status?: 'for_sale' | 'rental' | null
+    propertyType?: string | null
     minPrice?: number | null
     maxPrice?: number | null
     minBedrooms?: number | null
+    maxBedrooms?: number | null
+    minSquareFeet?: number | null
+    maxSquareFeet?: number | null
+    furnishing?: string | null
+    facing?: string | null
     nearby?: boolean
     requiredAmenities?: string[]
   } = {}
@@ -80,26 +86,31 @@ export async function GET(req: NextRequest) {
 {
   "city": string or null,
   "status": "for_sale" | "rental" | null,
+  "propertyType": "apartment" | "house" | "villa" | "shop" | "godown" | "land" | "commercial" | null,
   "minPrice": number or null,
   "maxPrice": number or null,
   "minBedrooms": number or null,
+  "maxBedrooms": number or null,
+  "minSquareFeet": number or null,
+  "maxSquareFeet": number or null,
+  "furnishing": "unfurnished" | "semi_furnished" | "fully_furnished" | null,
+  "facing": "north" | "south" | "east" | "west" | "north_east" | "north_west" | "south_east" | "south_west" | null,
   "nearby": boolean,
-  "requiredAmenities": array of strings or []
+  "requiredAmenities": string[]
 }
-Indian price conversions (IMPORTANT):
-- "1 lakh" = 100000, "5 lakh" = 500000, "10 lakh" = 1000000
-- "1 crore" = 10000000, "2 crore" = 20000000, "1.5 crore" = 15000000, "1.85 crore" = 18500000
-- "50L" or "50 L" = 5000000, "2Cr" or "2 Cr" = 20000000
-- For "under X crore" or "below X crore": set maxPrice = X * 10000000
-- For "above X lakh" or "more than X lakh": set minPrice = X * 100000
-- renting/lease/rent → status: "rental", buying/purchase/sale/buy → status: "for_sale"
-- requiredAmenities uses these exact keys: parking, swimming_pool, gym, garden, security, lift, power_backup, club_house, intercom, cctv, air_conditioning, modular_kitchen, play_area, jogging_track
-  Examples: "with parking" → ["parking"], "pool and gym" → ["swimming_pool","gym"], "no amenity mentioned" → []
+Rules:
+- Indian prices: "1 lakh"=100000, "1 crore"=10000000, "1.5 crore"=15000000, "1.85 crore"=18500000, "50L"=5000000
+- "under/below X crore" → maxPrice = X*10000000; "above/more than X lakh" → minPrice = X*100000
+- renting/lease/rent → "rental"; buying/sale/purchase → "for_sale"; null if unclear
+- "2BHK"/"2 bedroom" → minBedrooms:2, maxBedrooms:2; "3+ BHK" → minBedrooms:3
+- "flat"/"apartment"/"flats" → propertyType:"apartment"; "bungalow"/"independent house" → "house"
+- "furnished" → "fully_furnished"; "semi-furnished" → "semi_furnished"; "unfurnished" → "unfurnished"
+- requiredAmenities keys: parking, swimming_pool, gym, garden, security, lift, power_backup, club_house, intercom, cctv, air_conditioning, modular_kitchen, play_area, jogging_track
+  "with parking" → ["parking"], "pool and gym" → ["swimming_pool","gym"], none mentioned → []
 - Return ONLY the JSON object, no explanation, no markdown`,
       question,
-      300
+      400
     )
-    // Strip markdown code fences if present
     const cleaned = raw.replace(/```json\n?|\n?```/g, '').trim()
     filters = JSON.parse(cleaned)
   } catch {
@@ -109,14 +120,28 @@ Indian price conversions (IMPORTANT):
   // Step 2: Query DB with extracted filters
   const where: Record<string, unknown> = {}
   if (filters.status) where.status = filters.status
+  if (filters.propertyType) where.propertyType = filters.propertyType
   if (filters.city) where.city = { contains: filters.city, mode: 'insensitive' }
+  if (filters.furnishing) where.furnishing = filters.furnishing
+  if (filters.facing) where.facing = filters.facing
   if (filters.minPrice || filters.maxPrice) {
     where.price = {
       ...(filters.minPrice ? { gte: filters.minPrice } : {}),
       ...(filters.maxPrice ? { lte: filters.maxPrice } : {}),
     }
   }
-  if (filters.minBedrooms) where.bedrooms = { gte: filters.minBedrooms }
+  if (filters.minBedrooms || filters.maxBedrooms) {
+    where.bedrooms = {
+      ...(filters.minBedrooms ? { gte: filters.minBedrooms } : {}),
+      ...(filters.maxBedrooms ? { lte: filters.maxBedrooms } : {}),
+    }
+  }
+  if (filters.minSquareFeet || filters.maxSquareFeet) {
+    where.squareFeet = {
+      ...(filters.minSquareFeet ? { gte: filters.minSquareFeet } : {}),
+      ...(filters.maxSquareFeet ? { lte: filters.maxSquareFeet } : {}),
+    }
+  }
 
   const rawProperties = await prisma.property.findMany({
     where,
