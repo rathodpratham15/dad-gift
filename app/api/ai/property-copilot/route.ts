@@ -71,6 +71,7 @@ export async function GET(req: NextRequest) {
     maxPrice?: number | null
     minBedrooms?: number | null
     nearby?: boolean
+    requiredAmenities?: string[]
   } = {}
 
   try {
@@ -82,7 +83,8 @@ export async function GET(req: NextRequest) {
   "minPrice": number or null,
   "maxPrice": number or null,
   "minBedrooms": number or null,
-  "nearby": boolean
+  "nearby": boolean,
+  "requiredAmenities": array of strings or []
 }
 Indian price conversions (IMPORTANT):
 - "1 lakh" = 100000, "5 lakh" = 500000, "10 lakh" = 1000000
@@ -91,6 +93,8 @@ Indian price conversions (IMPORTANT):
 - For "under X crore" or "below X crore": set maxPrice = X * 10000000
 - For "above X lakh" or "more than X lakh": set minPrice = X * 100000
 - renting/lease/rent → status: "rental", buying/purchase/sale/buy → status: "for_sale"
+- requiredAmenities uses these exact keys: parking, swimming_pool, gym, garden, security, lift, power_backup, club_house, intercom, cctv, air_conditioning, modular_kitchen, play_area, jogging_track
+  Examples: "with parking" → ["parking"], "pool and gym" → ["swimming_pool","gym"], "no amenity mentioned" → []
 - Return ONLY the JSON object, no explanation, no markdown`,
       question,
       300
@@ -117,17 +121,26 @@ Indian price conversions (IMPORTANT):
   const rawProperties = await prisma.property.findMany({
     where,
     orderBy: [{ isPopular: 'desc' }, { createdAt: 'desc' }],
-    take: 10,
+    take: 20,
     select: {
       id: true, title: true, slug: true, price: true, city: true,
       address: true, bedrooms: true, bathrooms: true, squareFeet: true,
       isPopular: true, rating: true, latitude: true, longitude: true, status: true,
+      features: true,
     },
   })
 
-  let properties = rawProperties
+  // Post-filter by required amenities (features JSON)
+  const requiredAmenities = filters.requiredAmenities ?? []
+  let properties = requiredAmenities.length > 0
+    ? rawProperties.filter((p) => {
+        const f = (p.features ?? {}) as Record<string, unknown>
+        return requiredAmenities.every((amenity) => f[amenity] === true)
+      })
+    : rawProperties
+
   if (userLat && userLon && filters.nearby) {
-    properties = rawProperties
+    properties = properties
       .filter((p) => p.latitude && p.longitude)
       .sort((a, b) =>
         distanceKm(userLat, userLon, a.latitude!, a.longitude!) -
@@ -135,7 +148,8 @@ Indian price conversions (IMPORTANT):
       )
   }
 
-  const top5 = properties.slice(0, 5)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const top5 = properties.slice(0, 5).map(({ features: _f, ...p }) => p)
 
   // Step 3: AI generates natural language answer
   const propertyList =
