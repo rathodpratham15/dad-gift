@@ -315,23 +315,30 @@ export default function PropertyDetailClient({
             )}
 
             {/* Amenities */}
-            {property.features && Object.values(property.features).some(Boolean) && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-bold mb-4">Amenities</h2>
-                <div className="flex flex-wrap gap-2">
-                  {Object.entries(property.features)
-                    .filter(([, v]) => v)
-                    .map(([key]) => (
-                      <span
-                        key={key}
-                        className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium capitalize"
-                      >
-                        {key.replace(/_/g, ' ')}
+            {(() => {
+              const AMENITY_LABELS: Record<string, string> = {
+                parking: 'Parking', swimming_pool: 'Swimming Pool', gym: 'Gym',
+                garden: 'Garden', security: '24/7 Security', lift: 'Lift / Elevator',
+                power_backup: 'Power Backup', club_house: 'Club House', intercom: 'Intercom',
+                cctv: 'CCTV', air_conditioning: 'Air Conditioning', modular_kitchen: 'Modular Kitchen',
+                play_area: 'Play Area', jogging_track: 'Jogging Track',
+                rainwater_harvesting: 'Rainwater Harvesting', solar_panels: 'Solar Panels',
+              }
+              const active = Object.entries(property.features ?? {}).filter(([, v]) => v)
+              if (active.length === 0) return null
+              return (
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold mb-4">Amenities</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {active.map(([key]) => (
+                      <span key={key} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                        {AMENITY_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                       </span>
                     ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })()}
 
             {/* Videos */}
             {property.videos && property.videos.length > 0 && (

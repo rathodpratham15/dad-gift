@@ -1,6 +1,6 @@
 import { redirect, notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
+import { auth, isSuperAdminEmail } from '@/lib/auth'
 import AdminHeader from '../../../admin-header'
 import PropertyForm from '../../property-form'
 import { updatePropertyAction } from '@/app/actions/property'
@@ -40,7 +40,7 @@ export default async function EditPropertyPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader newInquiriesCount={newInquiriesCount} />
+      <AdminHeader newInquiriesCount={newInquiriesCount} isSuperAdmin={isSuperAdminEmail(session.user.email)} />
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="mb-6">
