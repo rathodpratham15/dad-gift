@@ -43,6 +43,7 @@ export default async function DashboardPage() {
     images: (p.images as string[]) || [],
     videos: (p.videos as string[]) || [],
     features: p.features as Record<string, unknown> | null,
+    availableFrom: (p as any).availableFrom?.toISOString() ?? null,
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   }))

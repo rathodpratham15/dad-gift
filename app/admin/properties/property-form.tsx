@@ -22,9 +22,15 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
   const [geocoding, setGeocoding] = useState(false)
   const [mainImage, setMainImage] = useState(property?.mainImage || '')
   const [images, setImages] = useState<string[]>(property?.images || [])
+  const [videos, setVideos] = useState<string[]>(property?.videos || [])
+  const [videoInput, setVideoInput] = useState('')
   const [propertyType, setPropertyType] = useState<string>(property?.propertyType || 'house')
   const [lat, setLat] = useState<string>(property?.latitude?.toString() ?? '')
   const [lng, setLng] = useState<string>(property?.longitude?.toString() ?? '')
+  const [amenities, setAmenities] = useState<Record<string, boolean>>(() => {
+    const saved = (property?.features ?? {}) as Record<string, boolean>
+    return saved
+  })
   const mainImageInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -113,6 +119,8 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
     const fd = new FormData(e.currentTarget)
     fd.set('mainImage', mainImage)
     fd.set('images', JSON.stringify(images))
+    fd.set('videos', JSON.stringify(videos))
+    fd.set('features', JSON.stringify(amenities))
     const res = await action(fd)
     if (res) setResult(res)
     setSubmitting(false)
@@ -401,6 +409,136 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
               className={inputCls}
             />
           </div>
+          <div>
+            <label className={labelCls}>Floor No.</label>
+            <input type="number" name="floorNumber" min="0" defaultValue={property?.floorNumber ?? ''} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Total Floors</label>
+            <input type="number" name="totalFloors" min="1" defaultValue={property?.totalFloors ?? ''} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Parking Spots</label>
+            <input type="number" name="parkingSpots" min="0" defaultValue={property?.parkingSpots ?? ''} className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Furnishing</label>
+            <select name="furnishing" defaultValue={property?.furnishing ?? ''} className={`${inputCls} bg-white`}>
+              <option value="">Not specified</option>
+              <option value="unfurnished">Unfurnished</option>
+              <option value="semi_furnished">Semi-furnished</option>
+              <option value="fully_furnished">Fully Furnished</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Facing</label>
+            <select name="facing" defaultValue={property?.facing ?? ''} className={`${inputCls} bg-white`}>
+              <option value="">Not specified</option>
+              <option value="north">North</option>
+              <option value="south">South</option>
+              <option value="east">East</option>
+              <option value="west">West</option>
+              <option value="north_east">North-East</option>
+              <option value="north_west">North-West</option>
+              <option value="south_east">South-East</option>
+              <option value="south_west">South-West</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Available From</label>
+            <input
+              type="date"
+              name="availableFrom"
+              defaultValue={property?.availableFrom ? new Date(property.availableFrom).toISOString().split('T')[0] : ''}
+              className={inputCls}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Videos */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 className="font-semibold text-black mb-5">Videos</h2>
+        <div className="space-y-3 mb-3">
+          {videos.map((url, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="flex-1 text-sm text-gray-700 truncate bg-gray-50 px-3 py-2 rounded-xl border border-gray-200">{url}</span>
+              <button
+                type="button"
+                onClick={() => setVideos((prev) => prev.filter((_, idx) => idx !== i))}
+                className="w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shrink-0"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="url"
+            value={videoInput}
+            onChange={(e) => setVideoInput(e.target.value)}
+            placeholder="YouTube or Vimeo URL"
+            className={`${inputCls} flex-1`}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                if (videoInput.trim().startsWith('http')) {
+                  setVideos((prev) => [...prev, videoInput.trim()])
+                  setVideoInput('')
+                }
+              }
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (videoInput.trim().startsWith('http')) {
+                setVideos((prev) => [...prev, videoInput.trim()])
+                setVideoInput('')
+              }
+            }}
+            disabled={!videoInput.trim()}
+            className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-medium hover:bg-black transition-colors disabled:opacity-40"
+          >
+            Add
+          </button>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">Supports YouTube, Vimeo, or direct video URLs.</p>
+      </div>
+
+      {/* Amenities */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 className="font-semibold text-black mb-5">Amenities</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {[
+            { key: 'parking', label: 'Parking' },
+            { key: 'swimming_pool', label: 'Swimming Pool' },
+            { key: 'gym', label: 'Gym' },
+            { key: 'garden', label: 'Garden' },
+            { key: 'security', label: '24/7 Security' },
+            { key: 'lift', label: 'Lift / Elevator' },
+            { key: 'power_backup', label: 'Power Backup' },
+            { key: 'club_house', label: 'Club House' },
+            { key: 'intercom', label: 'Intercom' },
+            { key: 'cctv', label: 'CCTV' },
+            { key: 'air_conditioning', label: 'Air Conditioning' },
+            { key: 'modular_kitchen', label: 'Modular Kitchen' },
+            { key: 'play_area', label: 'Play Area' },
+            { key: 'jogging_track', label: 'Jogging Track' },
+            { key: 'rainwater_harvesting', label: 'Rainwater Harvesting' },
+            { key: 'solar_panels', label: 'Solar Panels' },
+          ].map(({ key, label }) => (
+            <label key={key} className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={!!amenities[key]}
+                onChange={(e) => setAmenities((prev) => ({ ...prev, [key]: e.target.checked }))}
+                className="rounded"
+              />
+              <span className="text-sm text-gray-700">{label}</span>
+            </label>
+          ))}
         </div>
       </div>
 

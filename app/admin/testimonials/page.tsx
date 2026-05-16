@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
+import { auth, isSuperAdminEmail } from '@/lib/auth'
 import AdminHeader from '../admin-header'
 import DeleteTestimonialButton from './delete-testimonial-button'
 import { Pencil, Star, Plus } from 'lucide-react'
@@ -35,7 +35,7 @@ export default async function AdminTestimonialsPage({ searchParams }: PageProps)
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader newInquiriesCount={newInquiriesCount} />
+      <AdminHeader newInquiriesCount={newInquiriesCount} isSuperAdmin={isSuperAdminEmail(session.user.email)} />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">

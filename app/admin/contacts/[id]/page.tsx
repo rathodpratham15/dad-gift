@@ -1,7 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { auth } from '@/lib/auth'
+import { auth, isSuperAdminEmail } from '@/lib/auth'
 import AdminHeader from '../../admin-header'
 import ContactActions from './contact-actions'
 import { ArrowLeft, Mail, Phone, Calendar, User } from 'lucide-react'
@@ -43,7 +43,7 @@ export default async function AdminContactDetailPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader newInquiriesCount={rawContact.status === 'new' ? newInquiriesCount - 1 : newInquiriesCount} />
+      <AdminHeader newInquiriesCount={rawContact.status === 'new' ? newInquiriesCount - 1 : newInquiriesCount} isSuperAdmin={isSuperAdminEmail(session.user.email)} />
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         <Link

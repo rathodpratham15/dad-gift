@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
+import { Resend } from 'resend'
 
 export async function submitContactAction(formData: FormData) {
   const name = (formData.get('name') as string)?.trim()
@@ -28,6 +29,29 @@ export async function submitContactAction(formData: FormData) {
       status: 'new',
     },
   })
+
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.RESEND_FROM_EMAIL
+  if (adminEmail && process.env.RESEND_API_KEY) {
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY)
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@realestate.pratham.click'
+      await resend.emails.send({
+        from: fromEmail,
+        to: adminEmail,
+        subject: `New inquiry from ${name}${subject ? `: ${subject}` : ''}`,
+        html: `
+          <h2>New Property Inquiry</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+          ${subject ? `<p><strong>Subject:</strong> ${subject}</p>` : ''}
+          <p><strong>Message:</strong></p>
+          <p style="background:#f5f5f5;padding:12px;border-radius:8px">${message.replace(/\n/g, '<br>')}</p>
+          <p style="color:#888;font-size:12px">View all inquiries in the <a href="${process.env.NEXTAUTH_URL}/admin/contacts">admin panel</a>.</p>
+        `,
+      })
+    } catch {}
+  }
 
   return { success: "Thank you for your message! We'll get back to you soon." }
 }

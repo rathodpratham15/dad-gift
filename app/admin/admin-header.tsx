@@ -3,19 +3,21 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { adminLogoutAction } from '@/app/actions/auth'
-import { Home, MessageSquare, Star, LogOut, ExternalLink } from 'lucide-react'
+import { Home, MessageSquare, Star, LogOut, ExternalLink, Users } from 'lucide-react'
 
 interface AdminHeaderProps {
   newInquiriesCount?: number
+  isSuperAdmin?: boolean
 }
 
-export default function AdminHeader({ newInquiriesCount = 0 }: AdminHeaderProps) {
+export default function AdminHeader({ newInquiriesCount = 0, isSuperAdmin = false }: AdminHeaderProps) {
   const pathname = usePathname()
 
-  const navItems = [
+  const navItems: Array<{ href: string; label: string; icon: typeof Home; badge?: number }> = [
     { href: '/admin/properties', label: 'Properties', icon: Home },
     { href: '/admin/contacts', label: 'Contacts', icon: MessageSquare, badge: newInquiriesCount },
     { href: '/admin/testimonials', label: 'Testimonials', icon: Star },
+    ...(isSuperAdmin ? [{ href: '/admin/users', label: 'Users', icon: Users }] : []),
   ]
 
   return (

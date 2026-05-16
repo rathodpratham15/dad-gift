@@ -181,27 +181,46 @@ export default function PropertyDetailClient({
       </div>
 
       {/* Image gallery */}
-      <section className="px-6 pb-8">
+      <section className="px-6 pb-4">
         <div className="max-w-7xl mx-auto">
           {allImages.length === 0 ? (
-            <div className="aspect-[16/7] rounded-3xl bg-gray-100 flex items-center justify-center text-gray-400">No Images</div>
-          ) : (
-            <div className={`grid gap-3 ${allImages.length === 1 ? 'grid-cols-1' : 'grid-cols-3'}`} style={{ gridTemplateRows: allImages.length > 1 ? 'repeat(2, 1fr)' : undefined }}>
-              {/* Main image — spans full height on left */}
+            <div className="aspect-video max-h-80 rounded-3xl bg-gray-100 flex items-center justify-center text-gray-400">No Images</div>
+          ) : allImages.length === 1 ? (
+            <div
+              className="relative cursor-pointer overflow-hidden rounded-3xl bg-gray-200 max-w-4xl mx-auto aspect-[16/10] max-h-[420px]"
+              onClick={() => openLightbox(0)}
+            >
+              <img src={allImages[0]} alt={property.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+            </div>
+          ) : allImages.length === 2 ? (
+            <div className="grid grid-cols-3 gap-3">
               <div
-                className={`relative cursor-pointer overflow-hidden rounded-3xl bg-gray-200 ${allImages.length > 1 ? 'col-span-2 row-span-2' : ''} aspect-[4/3]`}
+                className="col-span-2 relative cursor-pointer overflow-hidden rounded-3xl bg-gray-200 aspect-[4/3]"
                 onClick={() => openLightbox(0)}
               >
                 <img src={allImages[0]} alt={property.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
               </div>
-
-              {/* Right side — exactly 2 thumbnails */}
-              {allImages.length > 1 && allImages.slice(1, 3).map((img, i) => {
+              <div
+                className="col-span-1 relative cursor-pointer overflow-hidden rounded-2xl bg-gray-200 aspect-[4/3]"
+                onClick={() => openLightbox(1)}
+              >
+                <img src={allImages[1]} alt={`${property.title} 2`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-3" style={{ gridTemplateRows: 'repeat(2, minmax(0, 1fr))' }}>
+              <div
+                className="col-span-2 row-span-2 relative cursor-pointer overflow-hidden rounded-3xl bg-gray-200 aspect-[4/3] min-h-0"
+                onClick={() => openLightbox(0)}
+              >
+                <img src={allImages[0]} alt={property.title} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+              </div>
+              {allImages.slice(1, 3).map((img, i) => {
                 const isLast = i === 1 && allImages.length > 3
                 return (
                   <div
                     key={i}
-                    className="relative cursor-pointer overflow-hidden rounded-2xl bg-gray-200"
+                    className="relative cursor-pointer overflow-hidden rounded-2xl bg-gray-200 aspect-[4/3] min-h-0"
                     onClick={() => openLightbox(i + 1)}
                   >
                     <img src={img} alt={`${property.title} ${i + 2}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
@@ -235,45 +254,148 @@ export default function PropertyDetailClient({
       </section>
 
       {/* Details */}
-      <section className="py-8 px-6">
+      <section className="pt-2 pb-8 px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2">
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              {property.bedrooms && (
-                <div className="bg-gray-50 rounded-2xl p-4 text-center">
-                  <Bed className="h-6 w-6 mx-auto mb-2 text-gray-600" />
-                  <p className="text-2xl font-bold">{property.bedrooms}</p>
-                  <p className="text-sm text-gray-600">Bedrooms</p>
+            {/* Primary stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+              {property.bedrooms != null && (
+                <div className="bg-gray-50 rounded-xl p-3 text-center">
+                  <Bed className="h-5 w-5 mx-auto mb-1.5 text-gray-600" />
+                  <p className="text-xl font-bold">{property.bedrooms}</p>
+                  <p className="text-xs text-gray-600">Bedrooms</p>
                 </div>
               )}
-              {property.bathrooms && (
-                <div className="bg-gray-50 rounded-2xl p-4 text-center">
-                  <Bath className="h-6 w-6 mx-auto mb-2 text-gray-600" />
-                  <p className="text-2xl font-bold">{property.bathrooms}</p>
-                  <p className="text-sm text-gray-600">Bathrooms</p>
+              {property.bathrooms != null && (
+                <div className="bg-gray-50 rounded-xl p-3 text-center">
+                  <Bath className="h-5 w-5 mx-auto mb-1.5 text-gray-600" />
+                  <p className="text-xl font-bold">{property.bathrooms}</p>
+                  <p className="text-xs text-gray-600">Bathrooms</p>
                 </div>
               )}
-              {property.squareFeet && (
-                <div className="bg-gray-50 rounded-2xl p-4 text-center">
-                  <Maximize className="h-6 w-6 mx-auto mb-2 text-gray-600" />
-                  <p className="text-2xl font-bold">{property.squareFeet.toLocaleString()}</p>
-                  <p className="text-sm text-gray-600">sq.ft</p>
+              {property.squareFeet != null && (
+                <div className="bg-gray-50 rounded-xl p-3 text-center">
+                  <Maximize className="h-5 w-5 mx-auto mb-1.5 text-gray-600" />
+                  <p className="text-xl font-bold">{property.squareFeet.toLocaleString()}</p>
+                  <p className="text-xs text-gray-600">sq.ft</p>
                 </div>
               )}
-              {property.yearBuilt && (
-                <div className="bg-gray-50 rounded-2xl p-4 text-center">
-                  <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-600" />
-                  <p className="text-2xl font-bold">{property.yearBuilt}</p>
-                  <p className="text-sm text-gray-600">Year Built</p>
+              {property.yearBuilt != null && (
+                <div className="bg-gray-50 rounded-xl p-3 text-center">
+                  <Calendar className="h-5 w-5 mx-auto mb-1.5 text-gray-600" />
+                  <p className="text-xl font-bold">{property.yearBuilt}</p>
+                  <p className="text-xs text-gray-600">Year Built</p>
                 </div>
               )}
             </div>
+
+            {/* Secondary details */}
+            {(property.floorNumber != null || property.parkingSpots != null) && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {property.floorNumber != null && (
+                  <span className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                    Floor {property.floorNumber}{property.totalFloors ? ` / ${property.totalFloors}` : ''}
+                  </span>
+                )}
+                {property.parkingSpots != null && (
+                  <span className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                    {property.parkingSpots} Parking
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Property Info */}
+            {(property.furnishing || property.facing || property.availableFrom) && (
+              <div className="flex flex-wrap gap-3 mb-8">
+                {property.furnishing && (
+                  <span className="px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-sm font-medium capitalize">
+                    {property.furnishing.replace(/_/g, ' ')}
+                  </span>
+                )}
+                {property.facing && (
+                  <span className="px-4 py-2 rounded-full bg-amber-50 text-amber-700 text-sm font-medium capitalize">
+                    {property.facing.replace(/_/g, '-')} facing
+                  </span>
+                )}
+                {property.availableFrom && (
+                  <span className="px-4 py-2 rounded-full bg-green-50 text-green-700 text-sm font-medium">
+                    Available from {new Date(property.availableFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </span>
+                )}
+              </div>
+            )}
 
             {property.description && (
               <div className="mb-8">
                 <h2 className="text-2xl font-bold mb-4">Description</h2>
                 <p className="text-gray-700 leading-relaxed">{property.description}</p>
+              </div>
+            )}
+
+            {/* Amenities */}
+            {(() => {
+              const AMENITY_LABELS: Record<string, string> = {
+                parking: 'Parking', swimming_pool: 'Swimming Pool', gym: 'Gym',
+                garden: 'Garden', security: '24/7 Security', lift: 'Lift / Elevator',
+                power_backup: 'Power Backup', club_house: 'Club House', intercom: 'Intercom',
+                cctv: 'CCTV', air_conditioning: 'Air Conditioning', modular_kitchen: 'Modular Kitchen',
+                play_area: 'Play Area', jogging_track: 'Jogging Track',
+                rainwater_harvesting: 'Rainwater Harvesting', solar_panels: 'Solar Panels',
+              }
+              const active = Object.entries(property.features ?? {}).filter(([, v]) => v)
+              if (active.length === 0) return null
+              return (
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold mb-4">Amenities</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {active.map(([key]) => (
+                      <span key={key} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+                        {AMENITY_LABELS[key] ?? key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
+
+            {/* Videos */}
+            {property.videos && property.videos.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-4">Videos</h2>
+                <div className="space-y-4">
+                  {property.videos.map((url, i) => {
+                    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/)
+                    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/)
+                    if (ytMatch) {
+                      return (
+                        <div key={i} className="rounded-2xl overflow-hidden aspect-video">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${ytMatch[1]}`}
+                            className="w-full h-full"
+                            title={`Video ${i + 1}`}
+                            allowFullScreen
+                          />
+                        </div>
+                      )
+                    }
+                    if (vimeoMatch) {
+                      return (
+                        <div key={i} className="rounded-2xl overflow-hidden aspect-video">
+                          <iframe
+                            src={`https://player.vimeo.com/video/${vimeoMatch[1]}`}
+                            className="w-full h-full"
+                            title={`Video ${i + 1}`}
+                            allowFullScreen
+                          />
+                        </div>
+                      )
+                    }
+                    return (
+                      <video key={i} src={url} controls className="w-full rounded-2xl" />
+                    )
+                  })}
+                </div>
               </div>
             )}
 

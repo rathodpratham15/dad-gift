@@ -85,6 +85,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     images: (rawProperty.images as string[]) || [],
     videos: (rawProperty.videos as string[]) || [],
     features: rawProperty.features as Record<string, unknown> | null,
+    availableFrom: rawProperty.availableFrom?.toISOString() ?? null,
     createdAt: rawProperty.createdAt.toISOString(),
     updatedAt: rawProperty.updatedAt.toISOString(),
   }
@@ -100,6 +101,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     images: (p.images as string[]) || [],
     videos: (p.videos as string[]) || [],
     features: p.features as Record<string, unknown> | null,
+    availableFrom: p.availableFrom?.toISOString() ?? null,
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   }))
@@ -123,6 +125,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           images: (p.images as string[]) || [],
           videos: (p.videos as string[]) || [],
           features: p.features as Record<string, unknown> | null,
+          availableFrom: p.availableFrom?.toISOString() ?? null,
           createdAt: p.createdAt.toISOString(),
           updatedAt: p.updatedAt.toISOString(),
         }))

@@ -11,7 +11,7 @@ export interface Property {
   latitude: number | null
   longitude: number | null
   price: number
-  propertyType: 'house' | 'shop' | 'godown' | 'land' | 'commercial' | 'other'
+  propertyType: 'apartment' | 'house' | 'villa' | 'shop' | 'godown' | 'land' | 'commercial' | 'other'
   propertyTypeOther?: string | null
   bedrooms: number | null
   bathrooms: number | null
@@ -30,8 +30,22 @@ export interface Property {
   agentId: number | null
   agent?: Agent
   features: Record<string, unknown> | null
+  floorNumber: number | null
+  totalFloors: number | null
+  parkingSpots: number | null
+  furnishing: 'unfurnished' | 'semi_furnished' | 'fully_furnished' | null
+  facing: 'north' | 'south' | 'east' | 'west' | null
+  availableFrom: string | null
   createdAt: string
   updatedAt: string
+}
+
+export interface SavedSearch {
+  id: number
+  userId: number
+  name: string | null
+  filters: Record<string, unknown>
+  createdAt: string
 }
 
 export interface Agent {
