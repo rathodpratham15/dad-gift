@@ -25,6 +25,14 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
   const [videos, setVideos] = useState<string[]>(property?.videos || [])
   const [videoInput, setVideoInput] = useState('')
   const [propertyType, setPropertyType] = useState<string>(property?.propertyType || 'house')
+  const initPrice = (() => {
+    const p = property?.price
+    if (!p) return { unit: 'lacs' as const, display: '' }
+    if (p >= 10000000) return { unit: 'crores' as const, display: String(+(p / 10000000).toFixed(4)) }
+    return { unit: 'lacs' as const, display: String(+(p / 100000).toFixed(4)) }
+  })()
+  const [priceUnit, setPriceUnit] = useState<'lacs' | 'crores'>(initPrice.unit)
+  const [priceDisplay, setPriceDisplay] = useState(initPrice.display)
   const [lat, setLat] = useState<string>(property?.latitude?.toString() ?? '')
   const [lng, setLng] = useState<string>(property?.longitude?.toString() ?? '')
   const [amenities, setAmenities] = useState<Record<string, boolean>>(() => {
@@ -121,6 +129,8 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
     fd.set('images', JSON.stringify(images))
     fd.set('videos', JSON.stringify(videos))
     fd.set('features', JSON.stringify(amenities))
+    const multiplier = priceUnit === 'crores' ? 10000000 : 100000
+    fd.set('price', priceDisplay ? String(parseFloat(priceDisplay) * multiplier) : '')
     const res = await action(fd)
     if (res) setResult(res)
     setSubmitting(false)
@@ -208,15 +218,27 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
             </select>
           </div>
           <div>
-            <label className={labelCls}>Price (₹) *</label>
-            <input
-              type="number"
-              name="price"
-              required
-              step="0.01"
-              defaultValue={property?.price || ''}
-              className={inputCls}
-            />
+            <label className={labelCls}>Price *</label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={priceDisplay}
+                onChange={(e) => setPriceDisplay(e.target.value)}
+                required
+                step="0.01"
+                min="0"
+                placeholder={priceUnit === 'crores' ? 'e.g. 1.25' : 'e.g. 75'}
+                className={`${inputCls} flex-1`}
+              />
+              <select
+                value={priceUnit}
+                onChange={(e) => setPriceUnit(e.target.value as 'lacs' | 'crores')}
+                className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:border-black transition-colors"
+              >
+                <option value="lacs">Lacs (₹)</option>
+                <option value="crores">Crores (₹)</option>
+              </select>
+            </div>
           </div>
           <div>
             <label className={labelCls}>Rating (0-5)</label>
