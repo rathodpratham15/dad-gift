@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/client'
+import { put } from '@vercel/blob'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 
@@ -12,44 +12,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const contentType = req.headers.get('content-type') || ''
+  const formData = await req.formData()
+  const file = formData.get('file') as File | null
 
-  // Vercel Blob client-side upload — handles token generation and upload-completed callback
-  if (process.env.BLOB_READ_WRITE_TOKEN && contentType.includes('application/json')) {
+  if (!file) {
+    return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+  }
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
     try {
-      const body = (await req.json()) as HandleUploadBody
-      const jsonResponse = await handleUpload({
-        body,
-        request: req,
-        onBeforeGenerateToken: async () => ({
-          allowedContentTypes: [
-            'image/jpeg',
-            'image/png',
-            'image/gif',
-            'image/webp',
-            'image/svg+xml',
-          ],
-          maximumSizeInBytes: 10 * 1024 * 1024, // 10 MB
-        }),
-        onUploadCompleted: async ({ blob }: { blob: { url: string } }) => {
-          console.log('Blob upload completed:', blob.url)
-        },
+      const arrayBuffer = await file.arrayBuffer()
+      const blob = await put(file.name, Buffer.from(arrayBuffer), {
+        access: 'public',
+        addRandomSuffix: true,
+        contentType: file.type || 'application/octet-stream',
       })
-      return NextResponse.json(jsonResponse)
+      return NextResponse.json({ url: blob.url })
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
-      console.error('Vercel Blob handleUpload error:', message)
-      return NextResponse.json({ error: message }, { status: 400 })
+      console.error('[upload] Vercel Blob error:', message)
+      return NextResponse.json({ error: 'Upload failed', detail: message }, { status: 500 })
     }
   }
 
-  // Local dev fallback — save to public/uploads/
+  // Local dev fallback
   try {
-    const formData = await req.formData()
-    const file = formData.get('file') as File | null
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
-    }
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     const ext = path.extname(file.name) || '.jpg'
@@ -59,7 +46,8 @@ export async function POST(req: NextRequest) {
     await writeFile(path.join(uploadDir, filename), buffer)
     return NextResponse.json({ url: `/uploads/${filename}` })
   } catch (err) {
-    console.error('Local upload error:', err)
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('[upload] Local fallback error:', message)
+    return NextResponse.json({ error: 'Upload failed', detail: message }, { status: 500 })
   }
 }
