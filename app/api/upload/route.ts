@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
-import { put } from '@vercel/blob'
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client'
 import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 
@@ -12,58 +12,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const formData = await req.formData()
-  const file = formData.get('file') as File | null
+  const contentType = req.headers.get('content-type') || ''
 
-  if (!file) {
-    return NextResponse.json({ error: 'No file provided' }, { status: 400 })
-  }
-
-  // Cloudinary — works on any host, preferred for self-hosted deployments
-  if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_UPLOAD_PRESET) {
+  // Vercel Blob client-side upload — handles token generation and upload-completed callback
+  if (process.env.BLOB_READ_WRITE_TOKEN && contentType.includes('application/json')) {
     try {
-      const cloudForm = new FormData()
-      cloudForm.append('file', file)
-      cloudForm.append('upload_preset', process.env.CLOUDINARY_UPLOAD_PRESET)
-
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
-        { method: 'POST', body: cloudForm }
-      )
-
-      if (!res.ok) {
-        const errText = await res.text()
-        console.error('Cloudinary upload failed:', errText)
-        return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
-      }
-
-      const data = await res.json()
-      return NextResponse.json({ url: data.secure_url })
-    } catch (err) {
-      console.error('Cloudinary upload error:', err)
-      return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
-    }
-  }
-
-  // Vercel Blob
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
-    try {
-      const arrayBuffer = await file.arrayBuffer()
-      const blob = await put(file.name, Buffer.from(arrayBuffer), {
-        access: 'public',
-        addRandomSuffix: true,
-        contentType: file.type || 'application/octet-stream',
+      const body = (await req.json()) as HandleUploadBody
+      const jsonResponse = await handleUpload({
+        body,
+        request: req,
+        onBeforeGenerateToken: async () => ({
+          allowedContentTypes: [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/webp',
+            'image/svg+xml',
+          ],
+          maximumSizeInBytes: 10 * 1024 * 1024, // 10 MB
+        }),
+        onUploadCompleted: async ({ blob }: { blob: { url: string } }) => {
+          console.log('Blob upload completed:', blob.url)
+        },
       })
-      return NextResponse.json({ url: blob.url })
+      return NextResponse.json(jsonResponse)
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err)
-      console.error('Vercel Blob upload error:', message)
-      return NextResponse.json({ error: 'Vercel Blob upload failed', detail: message }, { status: 500 })
+      console.error('Vercel Blob handleUpload error:', message)
+      return NextResponse.json({ error: message }, { status: 400 })
     }
   }
 
   // Local dev fallback — save to public/uploads/
   try {
+    const formData = await req.formData()
+    const file = formData.get('file') as File | null
+    if (!file) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    }
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
     const ext = path.extname(file.name) || '.jpg'
@@ -74,9 +60,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: `/uploads/${filename}` })
   } catch (err) {
     console.error('Local upload error:', err)
-    return NextResponse.json(
-      { error: 'Upload failed — set CLOUDINARY_CLOUD_NAME + CLOUDINARY_UPLOAD_PRESET on the server' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
   }
 }

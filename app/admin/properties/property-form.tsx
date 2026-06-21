@@ -44,13 +44,24 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
   const formRef = useRef<HTMLFormElement>(null)
 
   const handleUpload = async (file: File, isMain: boolean) => {
-    const fd = new FormData()
-    fd.append('file', file)
-    const res = await fetch('/api/upload', { method: 'POST', body: fd })
-    const data = await res.json()
-    if (!data.url) throw new Error('No URL returned')
-    if (isMain) setMainImage(data.url)
-    else setImages((prev) => [...prev, data.url])
+    let url: string
+    if (process.env.NEXT_PUBLIC_USE_VERCEL_BLOB) {
+      const { upload } = await import('@vercel/blob/client')
+      const blob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload',
+      })
+      url = blob.url
+    } else {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!data.url) throw new Error(data.error ?? 'No URL returned')
+      url = data.url
+    }
+    if (isMain) setMainImage(url)
+    else setImages((prev) => [...prev, url])
   }
 
   const handleGalleryFiles = async (files: FileList) => {
