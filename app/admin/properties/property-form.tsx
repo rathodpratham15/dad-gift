@@ -95,24 +95,16 @@ export default function PropertyForm({ property, action, isEdit = false }: Prope
       setResult({ error: 'Fill in at least one address field before auto-detecting coordinates.' })
       return
     }
-    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-    if (!key) {
-      setResult({ error: 'Google Maps API key not configured (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY).' })
-      return
-    }
     setGeocoding(true)
     setResult(null)
     try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(fullAddress)}&key=${key}`
-      )
+      const res = await fetch(`/api/geocode?address=${encodeURIComponent(fullAddress)}`)
       const data = await res.json()
-      if (data.status === 'OK' && data.results[0]) {
-        const { lat: gLat, lng: gLng } = data.results[0].geometry.location
-        setLat(gLat.toString())
-        setLng(gLng.toString())
+      if (res.ok && data.lat != null && data.lng != null) {
+        setLat(data.lat.toString())
+        setLng(data.lng.toString())
       } else {
-        setResult({ error: 'Could not find coordinates for this address. Please enter them manually.' })
+        setResult({ error: data.error || 'Could not find coordinates for this address. Please enter them manually.' })
       }
     } catch {
       setResult({ error: 'Geocoding failed. Please try again.' })
