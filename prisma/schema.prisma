@@ -22,10 +22,22 @@ model User {
   updatedAt          DateTime      @updatedAt @map("updated_at")
   properties         Property[]
   contacts           Contact[]
-  favoriteProperties Property[]    @relation("UserFavorites")
+  favoriteProperties Property[]           @relation("UserFavorites")
   savedSearches      SavedSearch[]
+  adminAccessRequests AdminAccessRequest[]
 
   @@map("users")
+}
+
+model AdminAccessRequest {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status     String    @default("pending") @map("status")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  resolvedAt DateTime? @map("resolved_at")
+
+  @@map("admin_access_requests")
 }
 
 model Agent {

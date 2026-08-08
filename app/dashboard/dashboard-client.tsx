@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import type { Property, Contact } from '@/lib/types'
 import PropertyCard from '@/components/property-card'
-import { Heart, MessageSquare, Calendar, User, Lock } from 'lucide-react'
-import { updateProfileAction } from '@/app/actions/auth'
+import { Heart, MessageSquare, Calendar } from 'lucide-react'
 
 interface DashboardClientProps {
   user: { firstName: string; lastName: string; email: string }
@@ -13,22 +12,7 @@ interface DashboardClientProps {
 }
 
 export default function DashboardClient({ user, favorites, inquiries }: DashboardClientProps) {
-  const [activeTab, setActiveTab] = useState<'favorites' | 'inquiries' | 'profile'>('favorites')
-  const [profileResult, setProfileResult] = useState<{ error?: string; success?: string } | null>(null)
-  const [profileSaving, setProfileSaving] = useState(false)
-
-  const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setProfileSaving(true)
-    setProfileResult(null)
-    const fd = new FormData(e.currentTarget)
-    const res = await updateProfileAction(fd)
-    if (res) setProfileResult(res)
-    setProfileSaving(false)
-  }
-
-  const inputCls = 'w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-black transition-colors'
-  const labelCls = 'block text-sm font-medium text-gray-700 mb-1'
+  const [activeTab, setActiveTab] = useState<'favorites' | 'inquiries'>('favorites')
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,7 +52,7 @@ export default function DashboardClient({ user, favorites, inquiries }: Dashboar
         {/* Tabs */}
         <div className="max-w-7xl mx-auto">
           <div className="flex gap-1 bg-white rounded-2xl p-1 shadow-sm mb-8 w-fit">
-            {(['favorites', 'inquiries', 'profile'] as const).map((tab) => (
+            {(['favorites', 'inquiries'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -76,7 +60,7 @@ export default function DashboardClient({ user, favorites, inquiries }: Dashboar
                   activeTab === tab ? 'bg-black text-white' : 'text-gray-600 hover:text-black'
                 }`}
               >
-                {tab === 'favorites' ? 'Saved Properties' : tab === 'inquiries' ? 'My Inquiries' : 'Profile'}
+                {tab === 'favorites' ? 'Saved Properties' : 'My Inquiries'}
               </button>
             ))}
           </div>
@@ -147,74 +131,6 @@ export default function DashboardClient({ user, favorites, inquiries }: Dashboar
                   ))}
                 </div>
               )}
-            </div>
-          )}
-
-          {/* Profile Tab */}
-          {activeTab === 'profile' && (
-            <div className="max-w-xl space-y-6">
-              {profileResult?.error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm">{profileResult.error}</div>
-              )}
-              {profileResult?.success && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-2xl text-green-700 text-sm">{profileResult.success}</div>
-              )}
-
-              <form onSubmit={handleProfileSubmit} className="space-y-6">
-                {/* Name */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <div className="flex items-center gap-2 mb-5">
-                    <User className="h-5 w-5 text-gray-500" />
-                    <h2 className="font-semibold text-black">Personal Info</h2>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelCls}>First Name</label>
-                      <input type="text" name="firstName" defaultValue={user.firstName} required className={inputCls} />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Last Name</label>
-                      <input type="text" name="lastName" defaultValue={user.lastName} className={inputCls} />
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <label className={labelCls}>Email</label>
-                    <input type="email" value={user.email} disabled className={`${inputCls} bg-gray-50 text-gray-500`} />
-                    <p className="text-xs text-gray-400 mt-1">Email cannot be changed.</p>
-                  </div>
-                </div>
-
-                {/* Password */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <div className="flex items-center gap-2 mb-5">
-                    <Lock className="h-5 w-5 text-gray-500" />
-                    <h2 className="font-semibold text-black">Change Password</h2>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-4">Leave blank if you don&apos;t want to change your password.</p>
-                  <div className="space-y-4">
-                    <div>
-                      <label className={labelCls}>Current Password</label>
-                      <input type="password" name="currentPassword" autoComplete="current-password" className={inputCls} />
-                    </div>
-                    <div>
-                      <label className={labelCls}>New Password</label>
-                      <input type="password" name="newPassword" autoComplete="new-password" className={inputCls} />
-                    </div>
-                    <div>
-                      <label className={labelCls}>Confirm New Password</label>
-                      <input type="password" name="confirmPassword" autoComplete="new-password" className={inputCls} />
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={profileSaving}
-                  className="w-full py-3 rounded-xl bg-black text-white text-sm font-medium hover:bg-gray-900 transition-colors disabled:opacity-60"
-                >
-                  {profileSaving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </form>
             </div>
           )}
         </div>
