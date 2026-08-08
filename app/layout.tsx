@@ -1,14 +1,24 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from '@/components/ui/toaster'
+import RegisterServiceWorker from '@/components/register-sw'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 const siteUrl = 'https://realestate.pratham.click'
 
+export const viewport: Viewport = {
+  themeColor: '#000000',
+}
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Realest',
+  },
   title: {
     default: 'Realest — Discover the Perfect Place to Call Home',
     template: '%s | Realest',
@@ -63,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased">
         {children}
         <Toaster />
+        <RegisterServiceWorker />
       </body>
     </html>
   )
