@@ -2,9 +2,14 @@ import { redirect } from 'next/navigation'
 import { auth, isSuperAdminEmail } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import AdminHeader from '../admin-header'
+import AdminPagination from '../pagination'
 import UsersClient from './users-client'
 
-export default async function AdminUsersPage() {
+interface PageProps {
+  searchParams: Promise<Record<string, string>>
+}
+
+export default async function AdminUsersPage({ searchParams }: PageProps) {
   const session = await auth()
   if (!session?.user || (session.user as any).role !== 'admin') {
     redirect('/admin/login')
@@ -13,9 +18,28 @@ export default async function AdminUsersPage() {
     redirect('/admin/properties')
   }
 
-  const [users, newInquiriesCount] = await Promise.all([
+  const params = await searchParams
+  const page = parseInt(params.page || '1')
+  const search = params.search?.trim() || ''
+  const perPage = 10
+
+  const where = search
+    ? {
+        OR: [
+          { email: { contains: search, mode: 'insensitive' as const } },
+          { firstName: { contains: search, mode: 'insensitive' as const } },
+          { lastName: { contains: search, mode: 'insensitive' as const } },
+        ],
+      }
+    : {}
+
+  const [total, users, newInquiriesCount] = await Promise.all([
+    prisma.user.count({ where }),
     prisma.user.findMany({
+      where,
       orderBy: [{ role: 'asc' }, { createdAt: 'desc' }],
+      skip: (page - 1) * perPage,
+      take: perPage,
       select: {
         id: true,
         email: true,
@@ -29,6 +53,8 @@ export default async function AdminUsersPage() {
     }),
     prisma.contact.count({ where: { status: 'new' } }),
   ])
+
+  const lastPage = Math.max(1, Math.ceil(total / perPage))
 
   const serializedUsers = users.map((u) => ({
     ...u,
@@ -49,7 +75,14 @@ export default async function AdminUsersPage() {
           </p>
         </div>
 
-        <UsersClient users={serializedUsers} currentEmail={currentEmail} />
+        <UsersClient users={serializedUsers} currentEmail={currentEmail} search={search} />
+
+        <AdminPagination
+          page={page}
+          lastPage={lastPage}
+          basePath="/admin/users"
+          extraParams={search ? { search } : {}}
+        />
       </div>
     </div>
   )
