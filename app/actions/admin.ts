@@ -46,5 +46,48 @@ export async function updateUserRoleAction(userId: number, role: 'admin' | 'user
 
   await prisma.user.update({ where: { id: userId }, data: { role } })
   revalidatePath('/admin/users')
+  revalidatePath('/profile')
   return { success: `User role updated to ${role}.` }
+}
+
+export async function requestAdminAccessAction() {
+  const session = await auth()
+  if (!session?.user?.id) return { error: 'Not authenticated.' }
+
+  const userId = parseInt(session.user.id)
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) return { error: 'User not found.' }
+  if (user.role === 'admin') return { error: 'You already have admin access.' }
+
+  const existingPending = await prisma.adminAccessRequest.findFirst({
+    where: { userId, status: 'pending' },
+  })
+  if (existingPending) return { success: 'Your request is already pending review.' }
+
+  await prisma.adminAccessRequest.create({ data: { userId } })
+  revalidatePath('/profile')
+  return { success: 'Admin access request sent to the super admin.' }
+}
+
+export async function approveAdminAccessRequestAction(requestId: number) {
+  const session = await auth()
+  if (!session?.user?.email || !isSuperAdminEmail(session.user.email)) {
+    return { error: 'Only the super admin can grant admin access.' }
+  }
+
+  const request = await prisma.adminAccessRequest.findUnique({ where: { id: requestId } })
+  if (!request) return { error: 'Request not found.' }
+  if (request.status !== 'pending') return { error: 'This request has already been resolved.' }
+
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: request.userId }, data: { role: 'admin' } }),
+    prisma.adminAccessRequest.update({
+      where: { id: requestId },
+      data: { status: 'approved', resolvedAt: new Date() },
+    }),
+  ])
+
+  revalidatePath('/profile')
+  revalidatePath('/admin/users')
+  return { success: 'Admin access granted.' }
 }

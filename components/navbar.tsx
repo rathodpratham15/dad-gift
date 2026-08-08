@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { User, LogOut, LogIn, Menu, X } from 'lucide-react'
+import { User, UserCog, LogOut, LogIn, Menu, X } from 'lucide-react'
 import { logoutAction } from '@/app/actions/auth'
 
 interface NavbarProps {
@@ -104,6 +104,14 @@ export default function Navbar({ user, lightBg, solid }: NavbarProps) {
                       <User className="h-4 w-4" />
                       {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
                     </Link>
+                    <Link
+                      href="/profile"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <UserCog className="h-4 w-4" />
+                      Profile
+                    </Link>
                     <div className="border-t border-gray-100 my-1" />
                     <form action={logoutAction}>
                       <button
@@ -161,6 +169,13 @@ export default function Navbar({ user, lightBg, solid }: NavbarProps) {
                   >
                     <User className="h-4 w-4" />
                     {user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                  </Link>
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2 text-sm font-medium text-black/70"
+                  >
+                    <UserCog className="h-4 w-4" />
+                    Profile
                   </Link>
                   <form action={logoutAction}>
                     <button

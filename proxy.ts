@@ -8,12 +8,13 @@ export default auth((req) => {
 
   const isAdminRoute = nextUrl.pathname.startsWith('/admin') && nextUrl.pathname !== '/admin/login'
   const isDashboardRoute = nextUrl.pathname.startsWith('/dashboard')
+  const isProfileRoute = nextUrl.pathname.startsWith('/profile')
 
   if (isAdminRoute && !isAdmin) {
     return NextResponse.redirect(new URL('/admin/login', nextUrl))
   }
 
-  if (isDashboardRoute && !isLoggedIn) {
+  if ((isDashboardRoute || isProfileRoute) && !isLoggedIn) {
     return NextResponse.redirect(new URL('/login', nextUrl))
   }
 
@@ -21,5 +22,5 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/admin/:path*', '/dashboard/:path*'],
+  matcher: ['/admin/:path*', '/dashboard/:path*', '/profile/:path*'],
 }
