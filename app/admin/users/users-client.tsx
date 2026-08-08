@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { ShieldCheck, Shield, Mail } from 'lucide-react'
 import { updateUserRoleAction } from '@/app/actions/admin'
 
@@ -18,23 +19,31 @@ interface AdminUser {
 interface UsersClientProps {
   users: AdminUser[]
   currentEmail: string
+  search: string
 }
 
-export default function UsersClient({ users, currentEmail }: UsersClientProps) {
-  const [search, setSearch] = useState('')
+export default function UsersClient({ users, currentEmail, search }: UsersClientProps) {
+  const router = useRouter()
+  const [searchInput, setSearchInput] = useState(search)
   const [result, setResult] = useState<{ error?: string; success?: string } | null>(null)
   const [pending, startTransition] = useTransition()
   const [pendingId, setPendingId] = useState<number | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const filtered = users.filter((u) => {
-    const q = search.trim().toLowerCase()
-    if (!q) return true
-    return (
-      u.email.toLowerCase().includes(q) ||
-      u.firstName.toLowerCase().includes(q) ||
-      u.lastName.toLowerCase().includes(q)
-    )
-  })
+  useEffect(() => {
+    setSearchInput(search)
+  }, [search])
+
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams()
+      if (value.trim()) params.set('search', value.trim())
+      params.set('page', '1')
+      router.push(`/admin/users?${params.toString()}`)
+    }, 350)
+  }
 
   const handleRoleChange = (userId: number, role: 'admin' | 'user') => {
     setResult(null)
@@ -59,18 +68,18 @@ export default function UsersClient({ users, currentEmail }: UsersClientProps) {
         <div className="p-4 border-b border-gray-100">
           <input
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search by name or email..."
             className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-black"
           />
         </div>
 
         <div className="divide-y divide-gray-100">
-          {filtered.length === 0 && (
+          {users.length === 0 && (
             <div className="p-8 text-center text-gray-500 text-sm">No users found.</div>
           )}
-          {filtered.map((u) => {
+          {users.map((u) => {
             const isSelf = u.email === currentEmail
             const isAdmin = u.role === 'admin'
             const isThisRowPending = pending && pendingId === u.id
@@ -123,11 +132,6 @@ export default function UsersClient({ users, currentEmail }: UsersClientProps) {
           })}
         </div>
       </div>
-
-      <p className="text-xs text-gray-400">
-        Tip: emails listed in <code className="px-1.5 py-0.5 bg-gray-100 rounded">ADMIN_EMAILS</code> env var are
-        auto-promoted on every sign-in.
-      </p>
     </div>
   )
 }
