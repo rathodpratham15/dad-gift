@@ -75,7 +75,7 @@ export default function UsersClient({ users, currentEmail }: UsersClientProps) {
             const isAdmin = u.role === 'admin'
             const isThisRowPending = pending && pendingId === u.id
             return (
-              <div key={u.id} className="p-4 flex items-center justify-between gap-4">
+              <div key={u.id} className="p-4 flex flex-col md:flex-row md:items-center gap-3 md:justify-between">
                 <div className="flex items-center gap-3 min-w-0">
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
@@ -89,7 +89,7 @@ export default function UsersClient({ users, currentEmail }: UsersClientProps) {
                       {u.firstName} {u.lastName}
                       {isSelf && <span className="ml-2 text-xs font-normal text-gray-500">(you)</span>}
                     </p>
-                    <p className="text-sm text-gray-500 flex items-center gap-1.5 truncate">
+                    <p className="text-sm text-gray-500 flex items-center gap-1.5 min-w-0">
                       <Mail className="h-3.5 w-3.5 shrink-0" />
                       <span className="truncate">{u.email}</span>
                     </p>
