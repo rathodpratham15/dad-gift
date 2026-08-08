@@ -1,7 +1,14 @@
-const CACHE_NAME = 'realest-cache-v1'
+const CACHE_NAME = 'realest-cache-v2'
 const OFFLINE_URL = '/offline'
 
-const PRECACHE_URLS = ['/', OFFLINE_URL, '/icons/icon-192.png', '/icons/icon-512.png']
+const PRECACHE_URLS = [
+  '/',
+  OFFLINE_URL,
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-192-maskable.png',
+  '/icons/icon-512-maskable.png',
+]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
