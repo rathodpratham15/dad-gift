@@ -41,24 +41,16 @@ export default function Listings({ properties }: ListingsProps) {
   return (
     <section className="py-16 md:py-24 px-4 md:px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6 text-center md:text-left">
-          <div>
-            <span
-              className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4"
-              style={{ backgroundColor: '#A8D5E2', color: '#1a1a1a' }}
-            >
-              Listings
-            </span>
-            <h2 className="text-3xl md:text-5xl font-bold text-black">
-              Find homes that perfectly match your lifestyle
-            </h2>
-          </div>
-          <Link href="/listings" className="hidden md:block shrink-0">
-            <Button className="bg-black text-white hover:bg-black/90 rounded-full px-6 py-3 flex items-center">
-              View all
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
+        <div className="mb-12 text-center">
+          <span
+            className="inline-block px-4 py-2 rounded-full text-sm font-medium mb-4"
+            style={{ backgroundColor: '#A8D5E2', color: '#1a1a1a' }}
+          >
+            Listings
+          </span>
+          <h2 className="text-3xl md:text-5xl font-bold text-black">
+            Find homes that perfectly match your lifestyle
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -133,6 +125,15 @@ export default function Listings({ properties }: ListingsProps) {
               </div>
             </Link>
           ))}
+        </div>
+
+        <div className="mt-12 flex justify-center">
+          <Link href="/listings">
+            <Button className="bg-black text-white hover:bg-black/90 rounded-full px-6 py-3 flex items-center">
+              View all
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
